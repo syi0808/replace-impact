@@ -5,8 +5,8 @@ Stateless Vue/Vite app for generating shareable npm dependency replacement impac
 ## Local Run
 
 ```sh
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 Open `http://127.0.0.1:5173` and try:
@@ -18,17 +18,31 @@ Open `http://127.0.0.1:5173` and try:
 ## Verification
 
 ```sh
-npm run typecheck
-npm run test
-npm run test:e2e
+pnpm typecheck
+pnpm test
+pnpm test:e2e
 ```
 
 In restricted environments that cannot bind a local preview server, the E2E spec can be listed against the built app
 without starting Vite:
 
 ```sh
-npm run test:e2e:static -- --list
+pnpm test:e2e:static -- --list
 ```
+
+## GitHub Pages
+
+This repository includes a GitHub Actions workflow for Pages. In the repository settings, set **Pages** to deploy from
+**GitHub Actions**, then push to `main`.
+
+The Pages build uses:
+
+```sh
+pnpm build:pages
+```
+
+It builds with the `/replace-impact/` base path and copies `index.html` to `404.html` so direct links to Vue Router
+routes can load on GitHub Pages.
 
 ## Data Sources
 

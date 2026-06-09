@@ -5,7 +5,7 @@ import PackagePage from "./pages/PackagePage.vue";
 import ReportPage from "./pages/ReportPage.vue";
 
 export const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior() {
     return { top: 0 };
   },
@@ -13,22 +13,22 @@ export const router = createRouter({
     {
       path: "/",
       name: "home",
-      component: HomePage
+      component: HomePage,
     },
     {
       path: "/package/:pkgMatch(.*)*",
       name: "package",
-      component: PackagePage
+      component: PackagePage,
     },
     {
       path: "/report",
       name: "report",
-      component: ReportPage
+      component: ReportPage,
     },
     {
       path: "/methodology",
       name: "methodology",
-      component: MethodologyPage
-    }
-  ]
+      component: MethodologyPage,
+    },
+  ],
 });

@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.22.0",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "build": "vue-tsc --noEmit && vite build",
+    "build:pages": "vue-tsc --noEmit && vite build --base=/replace-impact/ && cp dist/index.html dist/404.html",
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run",
     "test:unit": "vitest run --config vitest.unit.config.mjs",
     "test:e2e": "playwright test",
-    "test:e2e:static": "npm run build && E2E_STATIC=1 playwright test",
+    "test:e2e:static": "pnpm build && E2E_STATIC=1 playwright test",
     "format": "prettier --check ."
   },
   "dependencies": {
