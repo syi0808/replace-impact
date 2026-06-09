@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
+import { Button } from "@/components/ui/button";
 </script>
 
 <template>
@@ -10,8 +11,12 @@ import { RouterLink, RouterView } from "vue-router";
         <span>replace-impact</span>
       </RouterLink>
       <nav class="site-nav" aria-label="Primary navigation">
-        <RouterLink to="/">Search</RouterLink>
-        <RouterLink to="/methodology">Methodology</RouterLink>
+        <Button :as="RouterLink" variant="ghost" size="sm" to="/"
+          >Search</Button
+        >
+        <Button :as="RouterLink" variant="ghost" size="sm" to="/methodology"
+          >Methodology</Button
+        >
       </nav>
     </header>
 

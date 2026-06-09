@@ -1,4 +1,7 @@
-export function formatCount(value: number | null, options: Intl.NumberFormatOptions = {}): string {
+export function formatCount(
+  value: number | null,
+  options: Intl.NumberFormatOptions = {},
+): string {
   if (value === null || Number.isNaN(value)) {
     return "unknown";
   }
@@ -8,8 +11,7 @@ export function formatCount(value: number | null, options: Intl.NumberFormatOpti
 
 export function formatCompact(value: number | null): string {
   return formatCount(value, {
-    notation: "compact",
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   });
 }
 
@@ -94,7 +96,7 @@ export function formatUsd(value: number | null): string {
   return new Intl.NumberFormat("en", {
     style: "currency",
     currency: "USD",
-    maximumFractionDigits: Math.abs(value) >= 10 ? 0 : 2
+    maximumFractionDigits: Math.abs(value) >= 10 ? 0 : 2,
   }).format(value);
 }
 

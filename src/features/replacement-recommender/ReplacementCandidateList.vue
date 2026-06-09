@@ -2,6 +2,10 @@
 import { AlertTriangle, ArrowRight, ExternalLink } from "lucide-vue-next";
 import { computed } from "vue";
 import { RouterLink } from "vue-router";
+import { Alert } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import type { ReplacementCandidate } from "../../types/replacement";
 import { isValidPackageName } from "../../core/npm/resolvePackage";
 
@@ -17,7 +21,7 @@ function reportUrl(candidate: ReplacementCandidate): string {
   const params = new URLSearchParams({
     pkg: props.packageName,
     from: candidate.rule.from,
-    to: candidate.rule.to
+    to: candidate.rule.to,
   });
   return `/report?${params.toString()}`;
 }
@@ -43,15 +47,15 @@ function sourceLabel(candidate: ReplacementCandidate): string {
         <p class="eyebrow">e18e/module-replacements</p>
         <h2 id="replacement-heading">Replacement candidates</h2>
       </div>
-      <span class="count-chip">{{ candidates.length }} matches</span>
+      <Badge variant="outline">{{ candidates.length }} matches</Badge>
     </div>
 
-    <p v-if="unavailableMessage" class="status status-warning">
+    <Alert v-if="unavailableMessage" variant="warning">
       {{ unavailableMessage }}
-    </p>
+    </Alert>
 
     <div v-if="sortedCandidates.length" class="candidate-list">
-      <article
+      <Card
         v-for="candidate in sortedCandidates"
         :key="`${candidate.dependencyKind}-${candidate.rule.from}-${candidate.rule.to}`"
         class="candidate-card"
@@ -63,45 +67,55 @@ function sourceLabel(candidate: ReplacementCandidate): string {
             <code>{{ candidate.rule.to }}</code>
           </div>
           <p class="muted">
-            Current range {{ candidate.currentRange }} - {{ candidate.rule.type }}
+            Current range {{ candidate.currentRange }} -
+            {{ candidate.rule.type }}
           </p>
           <p class="muted">Source: {{ sourceLabel(candidate) }}</p>
         </div>
 
         <div class="candidate-badges">
-          <span v-if="candidate.dependencyKind === 'optional'" class="badge">optional</span>
-          <span v-if="candidate.dependencyKind === 'peer'" class="badge badge-caution">
+          <Badge v-if="candidate.dependencyKind === 'optional'">optional</Badge>
+          <Badge v-if="candidate.dependencyKind === 'peer'" variant="caution">
             <AlertTriangle aria-hidden="true" :size="14" /> peer caution
-          </span>
-          <span v-if="candidate.rule.caution" class="badge badge-caution">
+          </Badge>
+          <Badge v-if="candidate.rule.caution" variant="caution">
             <AlertTriangle aria-hidden="true" :size="14" /> caution
-          </span>
+          </Badge>
         </div>
 
-        <p v-if="candidate.rule.caution" class="candidate-note">{{ candidate.rule.caution }}</p>
+        <p v-if="candidate.rule.caution" class="candidate-note">
+          {{ candidate.rule.caution }}
+        </p>
 
         <div class="candidate-actions">
-          <RouterLink
+          <Button
             v-if="isValidPackageName(candidate.rule.to)"
-            class="secondary-button"
+            :as="RouterLink"
+            variant="outline"
             :to="reportUrl(candidate)"
           >
             <span>View impact</span>
             <ArrowRight aria-hidden="true" :size="16" />
-          </RouterLink>
-          <span v-else class="status">Native or manual replacement</span>
-          <a
+          </Button>
+          <Alert v-else>Native or manual replacement</Alert>
+          <Button
             v-if="candidate.rule.docsUrl || candidate.rule.sourceUrl"
-            class="icon-link"
+            as="a"
+            variant="outline"
+            size="icon"
             :href="candidate.rule.docsUrl || candidate.rule.sourceUrl"
             target="_blank"
             rel="noreferrer"
-            :title="candidate.rule.docsUrl ? 'Open migration guide' : 'Open replacement source'"
+            :title="
+              candidate.rule.docsUrl
+                ? 'Open migration guide'
+                : 'Open replacement source'
+            "
           >
             <ExternalLink aria-hidden="true" :size="17" />
-          </a>
+          </Button>
         </div>
-      </article>
+      </Card>
     </div>
 
     <p v-else-if="!unavailableMessage" class="empty-state">

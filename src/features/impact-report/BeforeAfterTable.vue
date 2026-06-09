@@ -1,4 +1,12 @@
 <script setup lang="ts">
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import type { ImpactReport } from "../../types/report";
 import { formatBytes, formatCompact } from "../../core/metrics/formatting";
 
@@ -16,55 +24,67 @@ defineProps<{
       </div>
     </div>
 
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Metric</th>
-            <th>Before: {{ report.from }}</th>
-            <th>After: {{ report.to }}</th>
-            <th>Delta</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Packages</td>
-            <td>{{ formatCompact(report.before.packageCount) }}</td>
-            <td>{{ formatCompact(report.after.packageCount) }}</td>
-            <td>{{ formatCompact(report.before.packageCount - report.after.packageCount) }}</td>
-          </tr>
-          <tr>
-            <td>Compressed tarball traffic</td>
-            <td>{{ formatBytes(report.before.tarballBytes) }}</td>
-            <td>{{ formatBytes(report.after.tarballBytes) }}</td>
-            <td>{{ formatBytes(report.metrics.traffic.perInstall) }}</td>
-          </tr>
-          <tr>
-            <td>Files</td>
-            <td>{{ formatCompact(report.before.fileCount) }}</td>
-            <td>{{ formatCompact(report.after.fileCount) }}</td>
-            <td>{{ formatCompact(report.metrics.files.perInstall) }}</td>
-          </tr>
-          <tr>
-            <td>Unpacked size</td>
-            <td>{{ formatBytes(report.before.unpackedBytes) }}</td>
-            <td>{{ formatBytes(report.after.unpackedBytes) }}</td>
-            <td>{{ formatBytes(report.metrics.unpacked.perInstall) }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Metric</TableHead>
+          <TableHead>Before: {{ report.from }}</TableHead>
+          <TableHead>After: {{ report.to }}</TableHead>
+          <TableHead>Delta</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableRow>
+          <TableCell>Packages</TableCell>
+          <TableCell>{{ formatCompact(report.before.packageCount) }}</TableCell>
+          <TableCell>{{ formatCompact(report.after.packageCount) }}</TableCell>
+          <TableCell>{{
+            formatCompact(
+              report.before.packageCount - report.after.packageCount,
+            )
+          }}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Compressed tarball traffic</TableCell>
+          <TableCell>{{ formatBytes(report.before.tarballBytes) }}</TableCell>
+          <TableCell>{{ formatBytes(report.after.tarballBytes) }}</TableCell>
+          <TableCell>{{
+            formatBytes(report.metrics.traffic.perInstall)
+          }}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Files</TableCell>
+          <TableCell>{{ formatCompact(report.before.fileCount) }}</TableCell>
+          <TableCell>{{ formatCompact(report.after.fileCount) }}</TableCell>
+          <TableCell>{{
+            formatCompact(report.metrics.files.perInstall)
+          }}</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell>Unpacked size</TableCell>
+          <TableCell>{{ formatBytes(report.before.unpackedBytes) }}</TableCell>
+          <TableCell>{{ formatBytes(report.after.unpackedBytes) }}</TableCell>
+          <TableCell>{{
+            formatBytes(report.metrics.unpacked.perInstall)
+          }}</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
 
     <details class="node-details">
       <summary>Dependency nodes included</summary>
       <div class="node-columns">
         <div>
           <strong>Before</strong>
-          <code v-for="node in report.before.dependencyNodes" :key="node">{{ node }}</code>
+          <code v-for="node in report.before.dependencyNodes" :key="node">{{
+            node
+          }}</code>
         </div>
         <div>
           <strong>After</strong>
-          <code v-for="node in report.after.dependencyNodes" :key="node">{{ node }}</code>
+          <code v-for="node in report.after.dependencyNodes" :key="node">{{
+            node
+          }}</code>
         </div>
       </div>
     </details>

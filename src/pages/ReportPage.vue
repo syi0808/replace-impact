@@ -2,6 +2,9 @@
 import { AlertTriangle } from "lucide-vue-next";
 import { computed, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { Alert } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Spinner } from "@/components/ui/spinner";
 import type { ImpactReport } from "../types/report";
 import { isValidPackageName } from "../core/npm/resolvePackage";
 import { createImpactReport } from "../features/impact-report/createImpactReport";
@@ -18,7 +21,7 @@ const route = useRoute();
 const query = computed(() => ({
   pkg: stringQuery(route.query.pkg),
   from: stringQuery(route.query.from),
-  to: stringQuery(route.query.to)
+  to: stringQuery(route.query.to),
 }));
 
 const loading = ref(false);
@@ -47,19 +50,30 @@ watch(
     loading.value = true;
 
     try {
-      const loadedReport = await createImpactReport(params.pkg, params.from, params.to, {
-        signal: controller.signal
-      });
+      const loadedReport = await createImpactReport(
+        params.pkg,
+        params.from,
+        params.to,
+        {
+          signal: controller.signal,
+        },
+      );
       if (currentLoadId === loadId) {
         report.value = loadedReport;
       }
     } catch (loadError) {
-      if (loadError instanceof DOMException && loadError.name === "AbortError") {
+      if (
+        loadError instanceof DOMException &&
+        loadError.name === "AbortError"
+      ) {
         return;
       }
 
       if (currentLoadId === loadId) {
-        error.value = loadError instanceof Error ? loadError.message : "Report could not be generated.";
+        error.value =
+          loadError instanceof Error
+            ? loadError.message
+            : "Report could not be generated.";
       }
     } finally {
       if (currentLoadId === loadId) {
@@ -67,7 +81,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onUnmounted(() => {
@@ -78,7 +92,11 @@ function stringQuery(value: unknown): string {
   return Array.isArray(value) ? String(value[0] ?? "") : String(value ?? "");
 }
 
-function validateParams(params: { pkg: string; from: string; to: string }): string | null {
+function validateParams(params: {
+  pkg: string;
+  from: string;
+  to: string;
+}): string | null {
   if (!params.pkg || !params.from || !params.to) {
     return "Report URLs need pkg, from, and to query parameters.";
   }
@@ -96,14 +114,14 @@ function validateParams(params: { pkg: string; from: string; to: string }): stri
 <template>
   <section class="content-page report-page">
     <div v-if="loading" class="loading-panel">
-      <span class="spinner" aria-hidden="true"></span>
+      <Spinner />
       <span>Resolving live npm metadata and download reach...</span>
     </div>
 
-    <div v-else-if="error" class="status status-warning">
+    <Alert v-else-if="error" variant="warning" role="alert">
       <AlertTriangle aria-hidden="true" :size="18" />
       <span>{{ error }}</span>
-    </div>
+    </Alert>
 
     <template v-else-if="report">
       <header class="page-header report-header">
@@ -114,23 +132,32 @@ function validateParams(params: { pkg: string; from: string; to: string }): stri
           <code>{{ report.to }}</code>
         </h1>
         <p>
-          In <strong>{{ report.pkg }}</strong>, based on {{ report.rootPackage.name }}@{{ report.rootPackage.latestVersion }}
+          In <strong>{{ report.pkg }}</strong
+          >, based on {{ report.rootPackage.name }}@{{
+            report.rootPackage.latestVersion
+          }}
           and live npm registry data.
         </p>
         <div class="header-facts">
-          <span v-if="report.directDependency">
-            direct {{ report.directDependency.kind }} - {{ report.directDependency.range }}
-          </span>
-          <span v-else>not a direct dependency</span>
-          <span>monthly downloads {{ formatCount(report.downloads.monthly) }}</span>
-          <span>yearly downloads {{ formatCount(report.downloads.yearly) }}</span>
+          <Badge v-if="report.directDependency" variant="outline">
+            direct {{ report.directDependency.kind }} -
+            {{ report.directDependency.range }}
+          </Badge>
+          <Badge v-else variant="outline">not a direct dependency</Badge>
+          <Badge variant="outline"
+            >monthly downloads
+            {{ formatCount(report.downloads.monthly) }}</Badge
+          >
+          <Badge variant="outline"
+            >yearly downloads {{ formatCount(report.downloads.yearly) }}</Badge
+          >
         </div>
       </header>
 
-      <div v-if="report.directDependencyWarning" class="status status-warning">
+      <Alert v-if="report.directDependencyWarning" variant="warning">
         <AlertTriangle aria-hidden="true" :size="18" />
         <span>{{ report.directDependencyWarning }}</span>
-      </div>
+      </Alert>
 
       <ImpactSummary :report="report" />
       <BeforeAfterTable :report="report" />
@@ -146,8 +173,13 @@ function validateParams(params: { pkg: string; from: string; to: string }): stri
         </div>
         <ul class="warning-list">
           <li>Potential reach, not additive total.</li>
-          <li>Missing registry fields render as unknown rather than fabricated values.</li>
-          <li v-for="warning in report.warnings" :key="warning">{{ warning }}</li>
+          <li>
+            Missing registry fields render as unknown rather than fabricated
+            values.
+          </li>
+          <li v-for="warning in report.warnings" :key="warning">
+            {{ warning }}
+          </li>
         </ul>
       </section>
 

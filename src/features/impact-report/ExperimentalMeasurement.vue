@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { Play, AlertTriangle } from "lucide-vue-next";
 import { ref } from "vue";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import type { ImpactReport } from "../../types/report";
 import type { InstallMeasurementResult } from "../../core/webcontainer/runInstallMeasurement";
 import { runInstallMeasurement } from "../../core/webcontainer/runInstallMeasurement";
@@ -31,58 +34,61 @@ async function runMeasurement(): Promise<void> {
         <p class="eyebrow">Experimental</p>
         <h2 id="experimental-heading">WebContainer install measurement</h2>
       </div>
-      <button class="primary-button" type="button" :disabled="running" @click="runMeasurement">
+      <Button type="button" :disabled="running" @click="runMeasurement">
         <Play aria-hidden="true" :size="17" />
-        <span>{{ running ? "Running" : "Run browser install measurement" }}</span>
-      </button>
+        <span>{{
+          running ? "Running" : "Run browser install measurement"
+        }}</span>
+      </Button>
     </div>
 
     <p class="caveat">
-      Experimental results are browser-side install measurements and are not mixed into the primary registry estimate.
+      Experimental results are browser-side install measurements and are not
+      mixed into the primary registry estimate.
     </p>
 
     <div v-if="result?.ok" class="measurement-grid">
-      <div>
+      <Card>
         <span>Before packages</span>
         <strong>{{ formatCompact(result.before.packageCount) }}</strong>
-      </div>
-      <div>
+      </Card>
+      <Card>
         <span>After packages</span>
         <strong>{{ formatCompact(result.after.packageCount) }}</strong>
-      </div>
-      <div>
+      </Card>
+      <Card>
         <span>Package delta</span>
         <strong>{{ formatCompact(result.delta.packageCount) }}</strong>
-      </div>
-      <div>
+      </Card>
+      <Card>
         <span>Before files</span>
         <strong>{{ formatCompact(result.before.fileCount) }}</strong>
-      </div>
-      <div>
+      </Card>
+      <Card>
         <span>After files</span>
         <strong>{{ formatCompact(result.after.fileCount) }}</strong>
-      </div>
-      <div>
+      </Card>
+      <Card>
         <span>File delta</span>
         <strong>{{ formatCompact(result.delta.fileCount) }}</strong>
-      </div>
-      <div>
+      </Card>
+      <Card>
         <span>Before node_modules</span>
         <strong>{{ formatBytes(result.before.nodeModulesBytes) }}</strong>
-      </div>
-      <div>
+      </Card>
+      <Card>
         <span>After node_modules</span>
         <strong>{{ formatBytes(result.after.nodeModulesBytes) }}</strong>
-      </div>
-      <div>
+      </Card>
+      <Card>
         <span>Size delta</span>
         <strong>{{ formatBytes(result.delta.nodeModulesBytes) }}</strong>
-      </div>
+      </Card>
     </div>
 
-    <div v-else-if="result && !result.ok" class="status status-warning">
+    <Alert v-else-if="result && !result.ok" variant="warning">
       <AlertTriangle aria-hidden="true" :size="16" />
       <span>{{ result.reason }}</span>
-    </div>
+    </Alert>
   </section>
 </template>

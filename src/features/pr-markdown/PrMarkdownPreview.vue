@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Check, Copy } from "lucide-vue-next";
 import { computed, ref } from "vue";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import type { ImpactReport } from "../../types/report";
 import { generatePrMarkdown } from "./generatePrMarkdown";
 
@@ -11,8 +13,12 @@ const props = defineProps<{
 const copied = ref(false);
 const copyError = ref<string | null>(null);
 
-const reportUrl = computed(() => `${window.location.pathname}${window.location.search}`);
-const markdown = computed(() => generatePrMarkdown(props.report, reportUrl.value));
+const reportUrl = computed(
+  () => `${window.location.pathname}${window.location.search}`,
+);
+const markdown = computed(() =>
+  generatePrMarkdown(props.report, reportUrl.value),
+);
 
 async function copyMarkdown(): Promise<void> {
   copyError.value = null;
@@ -23,7 +29,10 @@ async function copyMarkdown(): Promise<void> {
       copied.value = false;
     }, 1600);
   } catch (error) {
-    copyError.value = error instanceof Error ? error.message : "Clipboard permission was denied.";
+    copyError.value =
+      error instanceof Error
+        ? error.message
+        : "Clipboard permission was denied.";
   }
 }
 </script>
@@ -35,13 +44,15 @@ async function copyMarkdown(): Promise<void> {
         <p class="eyebrow">Pull request note</p>
         <h2 id="markdown-heading">PR Markdown</h2>
       </div>
-      <button class="secondary-button" type="button" @click="copyMarkdown">
+      <Button variant="outline" type="button" @click="copyMarkdown">
         <Check v-if="copied" aria-hidden="true" :size="17" />
         <Copy v-else aria-hidden="true" :size="17" />
         <span>{{ copied ? "Copied" : "Copy" }}</span>
-      </button>
+      </Button>
     </div>
-    <p v-if="copyError" class="status status-warning">{{ copyError }}</p>
+    <Alert v-if="copyError" variant="warning" role="alert">{{
+      copyError
+    }}</Alert>
     <pre class="markdown-preview">{{ markdown }}</pre>
   </section>
 </template>

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { Alert } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import type { ImpactReport, SignedMetric } from "../../types/report";
 import {
   formatBytes,
@@ -50,21 +53,21 @@ function polarityClass(value: number | null): string {
         <p class="eyebrow">Registry estimate</p>
         <h2 id="impact-summary-heading">Impact summary</h2>
       </div>
-      <span class="count-chip">live npm metadata</span>
+      <Badge variant="outline">live npm metadata</Badge>
     </div>
 
-    <div
+    <Alert
       v-if="
         report.metrics.traffic.perInstall !== null &&
         report.metrics.traffic.perInstall < 0
       "
-      class="status status-warning"
+      variant="warning"
     >
       This replacement may increase package traffic.
-    </div>
+    </Alert>
 
     <div class="metric-grid">
-      <article
+      <Card
         v-for="metric in [
           report.metrics.traffic,
           report.metrics.files,
@@ -88,7 +91,7 @@ function polarityClass(value: number | null): string {
             <dd>{{ formatMetric(metric, metric.yearly) }}</dd>
           </div>
         </dl>
-      </article>
+      </Card>
     </div>
 
     <p class="caveat">

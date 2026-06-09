@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { calculateCarbonKgCO2e } from "./carbon";
-import { formatBytes, formatCarbon, formatDuration, formatHours } from "./formatting";
+import {
+  formatBytes,
+  formatCarbon,
+  formatCompact,
+  formatDuration,
+  formatHours,
+} from "./formatting";
 import { calculateTransferSeconds } from "./networkTime";
 import { calculatePerInstallDelta, calculatePeriodValue } from "./traffic";
 
@@ -36,5 +42,9 @@ describe("formatting", () => {
 
   it("formats transfer comparisons in hours instead of years", () => {
     expect(formatHours(60 * 60 * 24 * 400)).toBe("9,600 hr");
+  });
+
+  it("formats large counts with full digits instead of compact suffixes", () => {
+    expect(formatCompact(1_234_567)).toBe("1,234,567");
   });
 });

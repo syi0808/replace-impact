@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { Card } from "@/components/ui/card";
 import type { ImpactReport } from "../../types/report";
 import {
   carbonAssumptions,
@@ -56,12 +57,12 @@ const equivalentTooltips = {
     </dl>
 
     <div class="equivalence-grid" aria-label="Monthly lifestyle equivalents">
-      <div :title="equivalentTooltips.meal">
+      <Card :title="equivalentTooltips.meal">
         <span>Average meals</span>
         <strong>{{ formatCompact(monthlyEquivalents.meals) }}</strong>
         <small>1 meal = {{ CARBON_EQUIVALENTS.meal.kgCo2e }} kg CO2e</small>
-      </div>
-      <div :title="equivalentTooltips.warmShower10Min">
+      </Card>
+      <Card :title="equivalentTooltips.warmShower10Min">
         <span>Warm showers</span>
         <strong>{{
           formatCompact(monthlyEquivalents.warmShowers10Min)
@@ -70,19 +71,19 @@ const equivalentTooltips = {
           >10 min = {{ CARBON_EQUIVALENTS.warmShower10Min.kgCo2e }} kg
           CO2e</small
         >
-      </div>
-      <div :title="equivalentTooltips.phoneCharge">
+      </Card>
+      <Card :title="equivalentTooltips.phoneCharge">
         <span>Phone charges</span>
         <strong>{{ formatCompact(monthlyEquivalents.phoneCharges) }}</strong>
         <small
           >1 charge = {{ CARBON_EQUIVALENTS.phoneCharge.kgCo2e }} kg CO2</small
         >
-      </div>
-      <div :title="equivalentTooltips.socialCostOfCarbon">
+      </Card>
+      <Card :title="equivalentTooltips.socialCostOfCarbon">
         <span>Avoided climate damage</span>
         <strong>{{ formatUsd(monthlyEquivalents.avoidedDamageUsd) }}</strong>
         <small>$190 / tCO2</small>
-      </div>
+      </Card>
     </div>
 
     <p class="caveat">
