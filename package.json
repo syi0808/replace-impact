@@ -1,0 +1,34 @@
+{
+  "name": "replace-impact",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vue-tsc --noEmit && vite build",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run --config vitest.unit.config.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:static": "npm run build && E2E_STATIC=1 playwright test",
+    "format": "prettier --check ."
+  },
+  "dependencies": {
+    "@webcontainer/api": "^1.6.4",
+    "lucide-vue-next": "^0.468.0",
+    "vue": "^3.5.0",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.53.0",
+    "@vitejs/plugin-vue": "^6.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.8.0",
+    "vite": "^7.0.0",
+    "vitest": "^3.2.0",
+    "vue-tsc": "^2.2.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  }
+}
