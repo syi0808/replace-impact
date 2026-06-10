@@ -8,9 +8,9 @@ const logoUrl = `${import.meta.env.BASE_URL}favicon.svg`;
 <template>
   <div class="app-shell">
     <header class="site-header">
-      <RouterLink class="brand" to="/" aria-label="replace-impact home">
+      <RouterLink class="brand" to="/" aria-label="Replace Impact home">
         <img class="brand-logo" :src="logoUrl" alt="" width="32" height="32" />
-        <span>replace-impact</span>
+        <span>Replace Impact</span>
       </RouterLink>
       <nav class="site-nav" aria-label="Primary navigation">
         <Button :as="RouterLink" variant="ghost" size="sm" to="/"
