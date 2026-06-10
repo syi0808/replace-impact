@@ -1,7 +1,10 @@
 import { defineConfig } from "vitest/config";
 import vue from "@vitejs/plugin-vue";
 
-export default defineConfig({
+const pagesBase = "/replace-impact/";
+
+export default defineConfig(({ mode }) => ({
+  base: mode === "pages" ? pagesBase : "/",
   plugins: [vue()],
   resolve: {
     alias: {
@@ -24,4 +27,4 @@ export default defineConfig({
     environment: "node",
     include: ["src/**/*.test.ts"],
   },
-});
+}));
