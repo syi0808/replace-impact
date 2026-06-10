@@ -20,7 +20,6 @@ import ImpactSummary from "../features/impact-report/ImpactSummary.vue";
 import BeforeAfterTable from "../features/impact-report/BeforeAfterTable.vue";
 import NetworkImpact from "../features/impact-report/NetworkImpact.vue";
 import CarbonEstimate from "../features/impact-report/CarbonEstimate.vue";
-import ExperimentalMeasurement from "../features/impact-report/ExperimentalMeasurement.vue";
 import PrMarkdownPreview from "../features/pr-markdown/PrMarkdownPreview.vue";
 
 const route = useRoute();
@@ -213,7 +212,6 @@ function formatShortCount(value: number | null): string {
       </section>
 
       <PrMarkdownPreview :report="report" />
-      <ExperimentalMeasurement :report="report" />
     </template>
   </section>
 </template>

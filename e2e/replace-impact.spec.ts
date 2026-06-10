@@ -155,7 +155,7 @@ test("package page can create a manual replacement report", async ({
   await expect(page).toHaveURL("/report?pkg=vite&from=glob&to=tinyglobby");
 });
 
-test("report page renders primary estimates, caveats, markdown, and experimental fallback", async ({
+test("report page renders primary estimates, caveats, and markdown", async ({
   page,
   context,
 }) => {
@@ -181,15 +181,6 @@ test("report page renders primary estimates, caveats, markdown, and experimental
 
   await page.getByRole("button", { name: "Copy" }).click();
   await expect(page.getByRole("button", { name: "Copied" })).toBeVisible();
-
-  await page
-    .getByRole("button", { name: /Run browser install measurement/i })
-    .click();
-  await expect(
-    page.getByText(
-      /Pkg before|WebContainer measurement is unavailable|WebContainer failed|npm install exited|measurement failed/i,
-    ),
-  ).toBeVisible({ timeout: 30_000 });
 });
 
 test("limited reports and invalid query params show friendly warnings", async ({
