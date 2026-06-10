@@ -612,6 +612,29 @@ main {
   color: var(--ink);
 }
 
+.home-credits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1rem;
+  border-top: 1px solid var(--border);
+  margin-top: clamp(1.5rem, 4vw, 3rem);
+  padding-top: 1rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.home-credits a {
+  color: var(--accent-strong);
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 0.18rem;
+}
+
+.home-credits a:hover {
+  color: var(--ink);
+}
+
 .method-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 2rem;

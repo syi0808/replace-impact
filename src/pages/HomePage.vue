@@ -46,4 +46,30 @@ function exampleReportUrl(example: {
       </Button>
     </div>
   </section>
+
+  <footer class="home-credits" aria-label="Site credits">
+    <span>
+      Built for
+      <a href="https://github.com/e18e" target="_blank" rel="noreferrer">e18e</a
+      >.
+    </span>
+    <span>
+      Uses
+      <a
+        href="https://github.com/e18e/module-replacements"
+        target="_blank"
+        rel="noreferrer"
+        >e18e/module-replacements</a
+      >.
+    </span>
+    <span>
+      References
+      <a
+        href="https://github.com/Fuzzyma/e18e-tools"
+        target="_blank"
+        rel="noreferrer"
+        >Fuzzyma/e18e-tools</a
+      >.
+    </span>
+  </footer>
 </template>
