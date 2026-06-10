@@ -13,9 +13,7 @@ const props = defineProps<{
 const copied = ref(false);
 const copyError = ref<string | null>(null);
 
-const reportUrl = computed(
-  () => `${window.location.pathname}${window.location.search}`,
-);
+const reportUrl = computed(() => window.location.href);
 const markdown = computed(() =>
   generatePrMarkdown(props.report, reportUrl.value),
 );
