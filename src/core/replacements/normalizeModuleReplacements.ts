@@ -1,4 +1,7 @@
-import type { ReplacementRule, ReplacementRuleType } from "../../types/replacement";
+import type {
+  ReplacementRule,
+  ReplacementRuleType,
+} from "../../types/replacement";
 import { isValidPackageName } from "../npm/resolvePackage";
 
 type UnknownRecord = Record<string, unknown>;
@@ -6,25 +9,29 @@ type UnknownRecord = Record<string, unknown>;
 export function normalizeModuleReplacements(
   payload: unknown,
   sourceType: ReplacementRuleType = "unknown",
-  sourceUrl?: string
+  sourceUrl?: string,
 ): ReplacementRule[] {
   const rules: ReplacementRule[] = [];
   const seen = new Set<string>();
 
   function add(rule: ReplacementRule): void {
+    const to = rule.to?.trim() || null;
     const normalized: ReplacementRule = {
       ...rule,
       from: rule.from.trim(),
-      to: rule.to.trim(),
+      to,
       type: rule.type ?? sourceType,
-      sourceUrl: rule.sourceUrl ?? sourceUrl
+      sourceUrl: rule.sourceUrl ?? sourceUrl,
     };
 
-    if (!normalized.from || !normalized.to) {
+    if (
+      !normalized.from ||
+      (normalized.to === null && normalized.type !== "native")
+    ) {
       return;
     }
 
-    const key = `${normalized.from}\u0000${normalized.to}\u0000${normalized.type}`;
+    const key = `${normalized.from}\u0000${normalized.to ?? ""}\u0000${normalized.type}`;
     if (!seen.has(key)) {
       seen.add(key);
       rules.push(normalized);
@@ -37,7 +44,7 @@ export function normalizeModuleReplacements(
         from: inferredFrom,
         to: item,
         type: sourceType,
-        sourceUrl
+        sourceUrl,
       });
       return;
     }
@@ -47,35 +54,68 @@ export function normalizeModuleReplacements(
     }
 
     if (Array.isArray(item.replacements)) {
-      const from = readString(item, ["moduleName", "from", "name", "packageName"]) ?? inferredFrom;
+      const from =
+        readString(item, ["moduleName", "from", "name", "packageName"]) ??
+        inferredFrom;
       for (const nested of item.replacements) {
         parseItem(nested, from);
       }
       return;
     }
 
-    const from = inferredFrom ?? readString(item, ["from", "moduleName", "name", "packageName"]);
+    const from =
+      inferredFrom ??
+      readString(item, ["from", "moduleName", "name", "packageName"]);
     const to =
       readString(
         item,
         inferredFrom
-          ? ["to", "replacement", "replaceWith", "target", "package", "packageName", "moduleName", "name"]
-          : ["to", "replacement", "replaceWith", "target", "package", "packageName"]
+          ? [
+              "to",
+              "replacement",
+              "replaceWith",
+              "target",
+              "package",
+              "packageName",
+              "moduleName",
+              "name",
+            ]
+          : [
+              "to",
+              "replacement",
+              "replaceWith",
+              "target",
+              "package",
+              "packageName",
+            ],
       ) ??
       readFirstString(item.alternatives) ??
       readFirstString(item.replacement);
 
-    if (!from || !to) {
+    const type = normalizeRuleType(
+      readString(item, ["type", "category"]),
+      sourceType,
+    );
+
+    if (!from || (!to && type !== "native")) {
       return;
     }
 
     add({
       from,
       to,
-      type: normalizeRuleType(readString(item, ["type", "category"]), sourceType),
-      caution: readString(item, ["caution", "note", "notes", "reason", "description"]) ?? undefined,
+      type,
+      caution:
+        readString(item, [
+          "caution",
+          "note",
+          "notes",
+          "reason",
+          "description",
+        ]) ?? undefined,
       sourceUrl: readString(item, ["sourceUrl", "source", "url"]) ?? sourceUrl,
-      docsUrl: readString(item, ["docsUrl", "docs", "guide", "guideUrl"]) ?? undefined
+      docsUrl:
+        readString(item, ["docsUrl", "docs", "guide", "guideUrl"]) ?? undefined,
     });
   }
 
@@ -143,7 +183,9 @@ function readFirstString(value: unknown): string | null {
   return null;
 }
 
-function normalizeType(value: string | ReplacementRuleType): ReplacementRuleType {
+function normalizeType(
+  value: string | ReplacementRuleType,
+): ReplacementRuleType {
   const normalized = value.toLowerCase().replace(/_/g, "-");
 
   if (normalized.includes("native")) {
@@ -167,7 +209,7 @@ function normalizeType(value: string | ReplacementRuleType): ReplacementRuleType
 
 function normalizeRuleType(
   value: string | null,
-  sourceType: ReplacementRuleType
+  sourceType: ReplacementRuleType,
 ): ReplacementRuleType {
   const parsed = value ? normalizeType(value) : "unknown";
   if (parsed === "unknown" && sourceType !== "unknown") {

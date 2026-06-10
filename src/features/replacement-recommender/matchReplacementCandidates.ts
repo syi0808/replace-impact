@@ -1,9 +1,12 @@
 import type { DependencyEntry } from "../../types/package";
-import type { ReplacementCandidate, ReplacementRule } from "../../types/replacement";
+import type {
+  ReplacementCandidate,
+  ReplacementRule,
+} from "../../types/replacement";
 
 export function matchReplacementCandidates(
   dependencies: DependencyEntry[],
-  rules: ReplacementRule[]
+  rules: ReplacementRule[],
 ): ReplacementCandidate[] {
   const candidates: ReplacementCandidate[] = [];
   const seen = new Set<string>();
@@ -14,7 +17,7 @@ export function matchReplacementCandidates(
         continue;
       }
 
-      const key = `${dependency.name}\u0000${rule.to}\u0000${dependency.kind}`;
+      const key = `${dependency.name}\u0000${rule.to ?? ""}\u0000${dependency.kind}`;
       if (seen.has(key)) {
         continue;
       }
@@ -23,13 +26,16 @@ export function matchReplacementCandidates(
       candidates.push({
         rule,
         dependencyKind: dependency.kind,
-        currentRange: dependency.range
+        currentRange: dependency.range,
       });
     }
   }
 
   return candidates.sort((a, b) => {
     const kindOrder = { dependency: 0, optional: 1, peer: 2 };
-    return kindOrder[a.dependencyKind] - kindOrder[b.dependencyKind] || a.rule.from.localeCompare(b.rule.from);
+    return (
+      kindOrder[a.dependencyKind] - kindOrder[b.dependencyKind] ||
+      a.rule.from.localeCompare(b.rule.from)
+    );
   });
 }

@@ -21,9 +21,15 @@ function reportUrl(candidate: ReplacementCandidate): string {
   const params = new URLSearchParams({
     pkg: props.packageName,
     from: candidate.rule.from,
-    to: candidate.rule.to,
   });
+  if (candidate.rule.to) {
+    params.set("to", candidate.rule.to);
+  }
   return `/report?${params.toString()}`;
+}
+
+function hasTargetPackage(candidate: ReplacementCandidate): boolean {
+  return !!candidate.rule.to && isValidPackageName(candidate.rule.to);
 }
 
 function sourceLabel(candidate: ReplacementCandidate): string {
@@ -57,14 +63,14 @@ function sourceLabel(candidate: ReplacementCandidate): string {
     <div v-if="sortedCandidates.length" class="candidate-list">
       <Card
         v-for="candidate in sortedCandidates"
-        :key="`${candidate.dependencyKind}-${candidate.rule.from}-${candidate.rule.to}`"
+        :key="`${candidate.dependencyKind}-${candidate.rule.from}-${candidate.rule.to ?? 'native'}`"
         class="candidate-card"
       >
         <div>
           <div class="candidate-title">
             <code>{{ candidate.rule.from }}</code>
             <ArrowRight aria-hidden="true" :size="16" />
-            <code>{{ candidate.rule.to }}</code>
+            <code>{{ candidate.rule.to ?? "native API" }}</code>
           </div>
           <p class="muted">
             Current range {{ candidate.currentRange }} -
@@ -89,7 +95,7 @@ function sourceLabel(candidate: ReplacementCandidate): string {
 
         <div class="candidate-actions">
           <Button
-            v-if="isValidPackageName(candidate.rule.to)"
+            v-if="hasTargetPackage(candidate) || candidate.rule.to === null"
             :as="RouterLink"
             variant="outline"
             :to="reportUrl(candidate)"

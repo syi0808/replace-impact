@@ -9,27 +9,27 @@ describe("normalizeModuleReplacements", () => {
           glob: {
             replacement: "tinyglobby",
             type: "preferred",
-            caution: "Check glob pattern behavior."
-          }
+            caution: "Check glob pattern behavior.",
+          },
         },
         "preferred",
-        "https://example.test/preferred.json"
-      )
+        "https://example.test/preferred.json",
+      ),
     ).toEqual([
       {
         from: "glob",
         to: "tinyglobby",
         type: "preferred",
         caution: "Check glob pattern behavior.",
-        sourceUrl: "https://example.test/preferred.json"
-      }
+        sourceUrl: "https://example.test/preferred.json",
+      },
     ]);
   });
 
   it("normalizes array manifests and deduplicates entries", () => {
     const rules = normalizeModuleReplacements([
       { moduleName: "rimraf", replacement: "del" },
-      { from: "rimraf", to: "del" }
+      { from: "rimraf", to: "del" },
     ]);
 
     expect(rules).toHaveLength(1);
@@ -41,10 +41,10 @@ describe("normalizeModuleReplacements", () => {
       [
         {
           moduleName: "glob",
-          replacements: [{ moduleName: "tinyglobby" }]
-        }
+          replacements: [{ moduleName: "tinyglobby" }],
+        },
       ],
-      "preferred"
+      "preferred",
     );
 
     expect(rules).toEqual([
@@ -52,8 +52,8 @@ describe("normalizeModuleReplacements", () => {
         from: "glob",
         to: "tinyglobby",
         type: "preferred",
-        sourceUrl: undefined
-      }
+        sourceUrl: undefined,
+      },
     ]);
   });
 
@@ -62,16 +62,49 @@ describe("normalizeModuleReplacements", () => {
       [
         {
           moduleName: "glob",
-          replacements: [{ type: "package", name: "tinyglobby" }]
-        }
+          replacements: [{ type: "package", name: "tinyglobby" }],
+        },
       ],
-      "preferred"
+      "preferred",
     );
 
     expect(rules[0]).toMatchObject({
       from: "glob",
       to: "tinyglobby",
-      type: "preferred"
+      type: "preferred",
     });
+  });
+
+  it("keeps native replacements without target packages", () => {
+    const rules = normalizeModuleReplacements(
+      [
+        {
+          moduleName: "left-pad",
+          type: "native",
+          caution: "Use String.prototype.padStart instead.",
+        },
+      ],
+      "unknown",
+      "https://example.test/native.json",
+    );
+
+    expect(rules).toEqual([
+      {
+        from: "left-pad",
+        to: null,
+        type: "native",
+        caution: "Use String.prototype.padStart instead.",
+        sourceUrl: "https://example.test/native.json",
+        docsUrl: undefined,
+      },
+    ]);
+  });
+
+  it("drops target-less non-native replacements", () => {
+    expect(
+      normalizeModuleReplacements([
+        { moduleName: "left-pad", type: "preferred" },
+      ]),
+    ).toEqual([]);
   });
 });

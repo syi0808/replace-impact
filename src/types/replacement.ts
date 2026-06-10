@@ -9,7 +9,7 @@ export type ReplacementRuleType =
 
 export type ReplacementRule = {
   from: string;
-  to: string;
+  to: string | null;
   type: ReplacementRuleType;
   caution?: string;
   sourceUrl?: string;

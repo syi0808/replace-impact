@@ -112,14 +112,21 @@ function validateParams(params: {
   from: string;
   to: string;
 }): string | null {
-  if (!params.pkg || !params.from || !params.to) {
-    return "Report URLs need pkg, from, and to query parameters.";
+  if (!params.pkg || !params.from) {
+    return "Report URLs need pkg and from query parameters.";
   }
 
-  for (const [label, value] of Object.entries(params)) {
+  for (const [label, value] of [
+    ["pkg", params.pkg],
+    ["from", params.from],
+  ] as const) {
     if (!isValidPackageName(value)) {
       return `Invalid ${label} package name in this report URL.`;
     }
+  }
+
+  if (params.to && !isValidPackageName(params.to)) {
+    return "Invalid to package name in this report URL.";
   }
 
   return null;
@@ -151,7 +158,7 @@ function formatShortCount(value: number | null): string {
         <h1>
           <code>{{ report.from }}</code>
           <ArrowRight class="report-arrow" aria-hidden="true" :size="34" />
-          <code>{{ report.to }}</code>
+          <code>{{ report.to ?? "native API" }}</code>
         </h1>
         <p class="report-context">
           <strong>{{ report.pkg }}</strong> @

@@ -42,6 +42,7 @@ const dependencies = ref<DependencyEntry[]>([]);
 const candidates = ref<ReplacementCandidate[]>([]);
 const selectedDependencyName = ref("");
 const replacementPackageName = ref("");
+const removeDependency = ref(false);
 
 const selectedDependency = computed(
   () =>
@@ -54,8 +55,9 @@ const canCreateManualReport = computed(
   () =>
     !!metadata.value &&
     !!selectedDependency.value &&
-    isValidPackageName(replacementPackageName.value) &&
-    replacementPackageName.value.trim() !== selectedDependency.value.name,
+    (removeDependency.value ||
+      (isValidPackageName(replacementPackageName.value) &&
+        replacementPackageName.value.trim() !== selectedDependency.value.name)),
 );
 
 let loadId = 0;
@@ -72,6 +74,7 @@ watch(
     candidates.value = [];
     selectedDependencyName.value = "";
     replacementPackageName.value = "";
+    removeDependency.value = false;
     error.value = null;
     replacementError.value = null;
     replacementLoading.value = false;
@@ -155,8 +158,10 @@ function createManualReport(): void {
   const params = new URLSearchParams({
     pkg: metadata.value.name,
     from: selectedDependency.value.name,
-    to: replacementPackageName.value.trim(),
   });
+  if (!removeDependency.value) {
+    params.set("to", replacementPackageName.value.trim());
+  }
   router.push(`/report?${params.toString()}`);
 }
 </script>
@@ -265,7 +270,13 @@ function createManualReport(): void {
               spellcheck="false"
               placeholder="tinyglobby"
               aria-label="Replacement package"
+              :disabled="removeDependency"
             />
+          </Label>
+
+          <Label class="checkbox-label">
+            <input v-model="removeDependency" type="checkbox" />
+            <span>Remove dependency</span>
           </Label>
 
           <Button type="submit" :disabled="!canCreateManualReport">
@@ -287,6 +298,7 @@ function createManualReport(): void {
         </Alert>
         <Alert
           v-else-if="
+            !removeDependency &&
             replacementPackageName &&
             !isValidPackageName(replacementPackageName)
           "

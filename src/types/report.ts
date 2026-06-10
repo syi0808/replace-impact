@@ -27,7 +27,7 @@ export type ImpactReport = {
   rootPackage: PackageMetadata;
   pkg: string;
   from: string;
-  to: string;
+  to: string | null;
   directDependency: DependencyEntry | null;
   directDependencyWarning: string | null;
   before: PackageSnapshot;

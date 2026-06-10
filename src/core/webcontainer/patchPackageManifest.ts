@@ -9,15 +9,17 @@ export type PatchedManifest = {
 export function patchPackageManifest(
   manifest: NpmPackageVersion,
   from: string,
-  to: string
+  to?: string | null,
 ): PatchedManifest {
   const dependencies = { ...(manifest.dependencies ?? {}) };
   delete dependencies[from];
-  dependencies[to] ??= "latest";
+  if (to) {
+    dependencies[to] ??= "latest";
+  }
 
   return {
     name: manifest.name,
     version: `${manifest.version.replace(/-.*/, "")}-replace-impact.0`,
-    dependencies
+    dependencies,
   };
 }

@@ -24,9 +24,13 @@ export function generatePrMarkdown(
   );
 
   return [
-    "### Dependency replacement impact estimate",
+    report.to
+      ? "### Dependency replacement impact estimate"
+      : "### Dependency removal impact estimate",
     "",
-    `This PR replaces \`${report.from}\` with \`${report.to}\` in \`${report.pkg}\`.`,
+    report.to
+      ? `This PR replaces \`${report.from}\` with \`${report.to}\` in \`${report.pkg}\`.`
+      : `This PR replaces \`${report.from}\` with native APIs and removes the dependency from \`${report.pkg}\`.`,
     "",
     "Small per-install savings can compound across the ecosystem.",
     "",

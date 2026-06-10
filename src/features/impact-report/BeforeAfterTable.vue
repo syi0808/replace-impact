@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import {
   Archive,
   CloudDownload,
@@ -16,9 +17,11 @@ import {
 import type { ImpactReport } from "../../types/report";
 import { formatBytes, formatCompact } from "../../core/metrics/formatting";
 
-defineProps<{
+const props = defineProps<{
   report: ImpactReport;
 }>();
+
+const afterLabel = computed(() => props.report.to ?? "native API / removed");
 </script>
 
 <template>
@@ -35,7 +38,7 @@ defineProps<{
         <TableRow>
           <TableHead>Metric</TableHead>
           <TableHead :title="report.from">Before</TableHead>
-          <TableHead :title="report.to">After</TableHead>
+          <TableHead :title="afterLabel">After</TableHead>
           <TableHead>Delta</TableHead>
         </TableRow>
       </TableHeader>

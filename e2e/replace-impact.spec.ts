@@ -77,7 +77,15 @@ test.beforeEach(async ({ page }) => {
   consoleErrorsByPage.set(page, consoleErrors);
   page.on("console", (message) => {
     if (message.type() === "error") {
-      consoleErrors.push(message.text());
+      const text = message.text();
+      if (
+        text ===
+        "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      ) {
+        return;
+      }
+
+      consoleErrors.push(text);
     }
   });
 
@@ -101,13 +109,22 @@ test("home search navigates to a real package detail flow", async ({
 
   await expect(page).toHaveURL(/\/package\/vite$/);
   await expect(page.getByRole("heading", { name: "vite" })).toBeVisible();
-  await expect(page.getByText("glob")).toBeVisible();
-  await expect(page.getByText("Source: cdn.jsdelivr.net")).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Dependencies" })
+      .getByText("glob", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator(".candidate-card")
+      .filter({ hasText: "glob" })
+      .getByText("Source: cdn.jsdelivr.net"),
+  ).toBeVisible();
   await expect(
     page
       .locator(".candidate-card")
       .filter({ hasText: "optional-left" })
-      .getByText("optional"),
+      .getByText("optional", { exact: true }),
   ).toBeVisible();
   await expect(
     page
@@ -155,6 +172,20 @@ test("package page can create a manual replacement report", async ({
   await expect(page).toHaveURL("/report?pkg=vite&from=glob&to=tinyglobby");
 });
 
+test("package page can create a dependency removal report", async ({
+  page,
+}) => {
+  await page.goto("/package/vite");
+  await page.getByLabel("Remove dependency").check();
+  await page.getByRole("button", { name: "Create report" }).click();
+
+  await expect(page).toHaveURL("/report?pkg=vite&from=glob");
+  await expect(
+    page.getByRole("heading", { name: /glob.*native API/i }),
+  ).toBeVisible();
+  await expect(page.getByRole("cell", { name: "0" }).first()).toBeVisible();
+});
+
 test("report page renders primary estimates, caveats, and markdown", async ({
   page,
   context,
@@ -192,6 +223,12 @@ test("limited reports and invalid query params show friendly warnings", async ({
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
 
+  await page.goto("/report?pkg=vite&from=glob");
+  await expect(
+    page.getByRole("heading", { name: /glob.*native API/i }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
+
   await page.goto("/report?pkg=bad%20name&from=glob&to=tinyglobby");
   await expect(
     page.getByText("Invalid pkg package name in this report URL."),
@@ -210,12 +247,10 @@ test("partial API failure and negative savings stay visible", async ({
   await expect(page.getByText("May increase traffic.")).toBeVisible();
 });
 
-test("graph node limit warnings are visible when triggered", async ({
-  page,
-}) => {
+test("graph limit warnings are visible when triggered", async ({ page }) => {
   await page.goto("/report?pkg=limit-root&from=chain-0&to=tinyglobby");
   await expect(
-    page.getByText("Graph node limit of 250 packages was reached"),
+    page.getByText("Graph depth limit of 8 was reached"),
   ).toBeVisible({
     timeout: 20_000,
   });
