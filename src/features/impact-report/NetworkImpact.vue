@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Info, Wifi } from "lucide-vue-next";
 import {
   Table,
   TableBody,
@@ -12,7 +13,7 @@ import {
   calculateTransferSeconds,
   networkProfiles,
 } from "../../core/metrics/networkTime";
-import { formatHours } from "../../core/metrics/formatting";
+import { formatDuration } from "../../core/metrics/formatting";
 
 defineProps<{
   report: ImpactReport;
@@ -23,18 +24,23 @@ defineProps<{
   <section class="section-block" aria-labelledby="network-heading">
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Network profiles</p>
-        <h2 id="network-heading">Equivalent network transfer time avoided</h2>
+        <p class="eyebrow">Network</p>
+        <h2 id="network-heading">Transfer time</h2>
       </div>
     </div>
 
-    <Table>
+    <Table aria-label="Equivalent network transfer time avoided">
       <TableHeader>
         <TableRow>
           <TableHead>Profile</TableHead>
-          <TableHead>Downlink</TableHead>
-          <TableHead>Monthly equivalent</TableHead>
-          <TableHead>Yearly equivalent</TableHead>
+          <TableHead>
+            <span class="table-metric table-metric--right">
+              <Wifi aria-hidden="true" :size="15" />
+              Mbps
+            </span>
+          </TableHead>
+          <TableHead>Mo</TableHead>
+          <TableHead>Yr</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -42,7 +48,7 @@ defineProps<{
           <TableCell>{{ profile.label }}</TableCell>
           <TableCell>{{ profile.downlinkMbps }} Mbps</TableCell>
           <TableCell>{{
-            formatHours(
+            formatDuration(
               calculateTransferSeconds(
                 report.metrics.traffic.monthly,
                 profile.downlinkMbps,
@@ -50,7 +56,7 @@ defineProps<{
             )
           }}</TableCell>
           <TableCell>{{
-            formatHours(
+            formatDuration(
               calculateTransferSeconds(
                 report.metrics.traffic.yearly,
                 profile.downlinkMbps,
@@ -61,9 +67,9 @@ defineProps<{
       </TableBody>
     </Table>
 
-    <p class="caveat">
-      Equivalent network transfer time avoided is a transfer-time comparison,
-      not an install-duration claim.
+    <p class="report-note">
+      <Info aria-hidden="true" :size="16" />
+      <span>Transfer comparison, not install duration.</span>
     </p>
   </section>
 </template>

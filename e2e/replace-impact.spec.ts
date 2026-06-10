@@ -164,25 +164,20 @@ test("report page renders primary estimates, caveats, markdown, and experimental
   });
   await page.goto("/report?pkg=vite&from=glob&to=tinyglobby");
 
-  await expect(
-    page.getByRole("heading", { name: /Impact summary/i }),
-  ).toBeVisible();
-  await expect(page.getByText("direct dependency - ^10.0.0")).toBeVisible();
-  await expect(page.getByText("monthly downloads 1,000,000")).toBeVisible();
-  await expect(page.getByText("yearly downloads 12,000,000")).toBeVisible();
-  await expect(page.getByText("Monthly estimate").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
+  await expect(page.getByText("direct dependency ^10.0.0")).toBeVisible();
+  await expect(page.getByText("1M / mo")).toBeVisible();
+  await expect(page.getByText("12M / yr")).toBeVisible();
+  await expect(page.getByText("mo").first()).toBeVisible();
   await expect(page.getByText("Slow 3G")).toBeVisible();
   await expect(page.getByText("0.4 Mbps")).toBeVisible();
-  await expect(page.getByRole("cell", { name: /hr$/ }).first()).toBeVisible();
   await expect(
-    page.getByText("Carbon estimates are communication aids"),
+    page.getByRole("cell", { name: /sec|min|hr|days|years$/ }).first(),
   ).toBeVisible();
-  await expect(page.getByText("Average meals")).toBeVisible();
-  await expect(page.getByText("Phone charges")).toBeVisible();
-  await expect(page.getByText("Avoided climate damage")).toBeVisible();
-  await expect(
-    page.getByText("Report: /report?pkg=vite&from=glob&to=tinyglobby"),
-  ).toBeVisible();
+  await expect(page.getByText("Communication estimate only.")).toBeVisible();
+  await expect(page.getByText("Meals")).toBeVisible();
+  await expect(page.getByText("Charges")).toBeVisible();
+  await expect(page.getByText("Damage")).toBeVisible();
 
   await page.getByRole("button", { name: "Copy" }).click();
   await expect(page.getByRole("button", { name: "Copied" })).toBeVisible();
@@ -192,7 +187,7 @@ test("report page renders primary estimates, caveats, markdown, and experimental
     .click();
   await expect(
     page.getByText(
-      /Before packages|WebContainer measurement is unavailable|WebContainer failed|npm install exited|measurement failed/i,
+      /Pkg before|WebContainer measurement is unavailable|WebContainer failed|npm install exited|measurement failed/i,
     ),
   ).toBeVisible({ timeout: 30_000 });
 });
@@ -204,9 +199,7 @@ test("limited reports and invalid query params show friendly warnings", async ({
   await expect(
     page.getByText("not a direct dependency of vite@6.0.0"),
   ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: /Impact summary/i }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
 
   await page.goto("/report?pkg=bad%20name&from=glob&to=tinyglobby");
   await expect(
@@ -218,16 +211,12 @@ test("partial API failure and negative savings stay visible", async ({
   page,
 }) => {
   await page.goto("/report?pkg=downloads-fail&from=glob&to=tinyglobby");
-  await expect(
-    page.getByRole("heading", { name: /Impact summary/i }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
   await expect(page.getByText(/Monthly downloads unavailable/)).toBeVisible();
   await expect(page.getByText("unknown").first()).toBeVisible();
 
   await page.goto("/report?pkg=vite&from=tinyglobby&to=glob");
-  await expect(
-    page.getByText("This replacement may increase package traffic."),
-  ).toBeVisible();
+  await expect(page.getByText("May increase traffic.")).toBeVisible();
 });
 
 test("graph node limit warnings are visible when triggered", async ({
@@ -280,9 +269,7 @@ test("explicit report URLs work when e18e replacement data fails", async ({
   ).toBeVisible();
 
   await page.goto("/report?pkg=vite&from=glob&to=tinyglobby");
-  await expect(
-    page.getByRole("heading", { name: /Impact summary/i }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
 });
 
 async function mockExternalApis(page: Page): Promise<void> {

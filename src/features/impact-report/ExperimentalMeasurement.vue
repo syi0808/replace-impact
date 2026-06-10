@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { Play, AlertTriangle } from "lucide-vue-next";
+import {
+  AlertTriangle,
+  Archive,
+  FileStack,
+  Info,
+  PackageOpen,
+  Play,
+} from "lucide-vue-next";
 import { ref } from "vue";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -32,56 +39,90 @@ async function runMeasurement(): Promise<void> {
     <div class="section-heading-row">
       <div>
         <p class="eyebrow">Experimental</p>
-        <h2 id="experimental-heading">WebContainer install measurement</h2>
+        <h2 id="experimental-heading">Browser check</h2>
       </div>
-      <Button type="button" :disabled="running" @click="runMeasurement">
+      <Button
+        type="button"
+        :disabled="running"
+        :aria-label="
+          running
+            ? 'Browser install measurement running'
+            : 'Run browser install measurement'
+        "
+        @click="runMeasurement"
+      >
         <Play aria-hidden="true" :size="17" />
-        <span>{{
-          running ? "Running" : "Run browser install measurement"
-        }}</span>
+        <span>{{ running ? "Running" : "Run check" }}</span>
       </Button>
     </div>
 
-    <p class="caveat">
-      Experimental results are browser-side install measurements and are not
-      mixed into the primary registry estimate.
+    <p class="report-note">
+      <Info aria-hidden="true" :size="16" />
+      <span>Browser result, excluded from the estimate.</span>
     </p>
 
     <div v-if="result?.ok" class="measurement-grid">
       <Card>
-        <span>Before packages</span>
+        <span class="measurement-label">
+          <PackageOpen aria-hidden="true" :size="16" />
+          Pkg before
+        </span>
         <strong>{{ formatCompact(result.before.packageCount) }}</strong>
       </Card>
       <Card>
-        <span>After packages</span>
+        <span class="measurement-label">
+          <PackageOpen aria-hidden="true" :size="16" />
+          Pkg after
+        </span>
         <strong>{{ formatCompact(result.after.packageCount) }}</strong>
       </Card>
       <Card>
-        <span>Package delta</span>
+        <span class="measurement-label">
+          <PackageOpen aria-hidden="true" :size="16" />
+          Pkg delta
+        </span>
         <strong>{{ formatCompact(result.delta.packageCount) }}</strong>
       </Card>
       <Card>
-        <span>Before files</span>
+        <span class="measurement-label">
+          <FileStack aria-hidden="true" :size="16" />
+          Files before
+        </span>
         <strong>{{ formatCompact(result.before.fileCount) }}</strong>
       </Card>
       <Card>
-        <span>After files</span>
+        <span class="measurement-label">
+          <FileStack aria-hidden="true" :size="16" />
+          Files after
+        </span>
         <strong>{{ formatCompact(result.after.fileCount) }}</strong>
       </Card>
       <Card>
-        <span>File delta</span>
+        <span class="measurement-label">
+          <FileStack aria-hidden="true" :size="16" />
+          Files delta
+        </span>
         <strong>{{ formatCompact(result.delta.fileCount) }}</strong>
       </Card>
       <Card>
-        <span>Before node_modules</span>
+        <span class="measurement-label">
+          <Archive aria-hidden="true" :size="16" />
+          Size before
+        </span>
         <strong>{{ formatBytes(result.before.nodeModulesBytes) }}</strong>
       </Card>
       <Card>
-        <span>After node_modules</span>
+        <span class="measurement-label">
+          <Archive aria-hidden="true" :size="16" />
+          Size after
+        </span>
         <strong>{{ formatBytes(result.after.nodeModulesBytes) }}</strong>
       </Card>
       <Card>
-        <span>Size delta</span>
+        <span class="measurement-label">
+          <Archive aria-hidden="true" :size="16" />
+          Size delta
+        </span>
         <strong>{{ formatBytes(result.delta.nodeModulesBytes) }}</strong>
       </Card>
     </div>

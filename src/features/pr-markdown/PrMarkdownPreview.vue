@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Check, Copy } from "lucide-vue-next";
+import { Check, Copy, FileText } from "lucide-vue-next";
 import { computed, ref } from "vue";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -42,7 +42,7 @@ async function copyMarkdown(): Promise<void> {
     <div class="section-heading-row">
       <div>
         <p class="eyebrow">Pull request note</p>
-        <h2 id="markdown-heading">PR Markdown</h2>
+        <h2 id="markdown-heading">PR note</h2>
       </div>
       <Button variant="outline" type="button" @click="copyMarkdown">
         <Check v-if="copied" aria-hidden="true" :size="17" />
@@ -53,6 +53,12 @@ async function copyMarkdown(): Promise<void> {
     <Alert v-if="copyError" variant="warning" role="alert">{{
       copyError
     }}</Alert>
-    <pre class="markdown-preview">{{ markdown }}</pre>
+    <details class="preview-details">
+      <summary>
+        <FileText aria-hidden="true" :size="16" />
+        Preview
+      </summary>
+      <pre class="markdown-preview">{{ markdown }}</pre>
+    </details>
   </section>
 </template>

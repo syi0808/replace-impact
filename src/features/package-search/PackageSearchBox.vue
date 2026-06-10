@@ -166,7 +166,6 @@ function onSearchKeydown(event: KeyboardEvent): void {
         spellcheck="false"
         placeholder="Search npm package, e.g. vite"
         aria-label="npm package name"
-        role="combobox"
         aria-autocomplete="list"
         aria-haspopup="listbox"
         :aria-expanded="showSuggestions ? 'true' : 'false'"

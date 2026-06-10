@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomePage from "./pages/HomePage.vue";
-import MethodologyPage from "./pages/MethodologyPage.vue";
 import PackagePage from "./pages/PackagePage.vue";
 import ReportPage from "./pages/ReportPage.vue";
 
@@ -24,11 +23,6 @@ export const router = createRouter({
       path: "/report",
       name: "report",
       component: ReportPage,
-    },
-    {
-      path: "/methodology",
-      name: "methodology",
-      component: MethodologyPage,
     },
   ],
 });

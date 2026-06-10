@@ -22,11 +22,11 @@ function exampleReportUrl(example: {
 <template>
   <section class="hero-workspace">
     <div class="hero-copy">
-      <p class="eyebrow">npm replacement impact reports</p>
-      <h1>A few files less.<br />Millions of times less work.</h1>
+      <p class="eyebrow">Dependency replacement reports</p>
+      <h1>Measure dependency replacement impact.</h1>
       <p>
-        Generate a shareable report from live npm metadata, downloads reach, and
-        e18e replacement data.
+        Estimate files, package traffic, and carbon-equivalent impact from live
+        npm metadata and e18e replacement data.
       </p>
     </div>
 

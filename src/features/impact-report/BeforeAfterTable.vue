@@ -1,5 +1,11 @@
 <script setup lang="ts">
 import {
+  Archive,
+  CloudDownload,
+  FileStack,
+  PackageOpen,
+} from "lucide-vue-next";
+import {
   Table,
   TableBody,
   TableCell,
@@ -19,8 +25,8 @@ defineProps<{
   <section class="section-block" aria-labelledby="before-after-heading">
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Subtree comparison</p>
-        <h2 id="before-after-heading">Before / after</h2>
+        <p class="eyebrow">Subtree</p>
+        <h2 id="before-after-heading">Before / After</h2>
       </div>
     </div>
 
@@ -28,14 +34,19 @@ defineProps<{
       <TableHeader>
         <TableRow>
           <TableHead>Metric</TableHead>
-          <TableHead>Before: {{ report.from }}</TableHead>
-          <TableHead>After: {{ report.to }}</TableHead>
+          <TableHead :title="report.from">Before</TableHead>
+          <TableHead :title="report.to">After</TableHead>
           <TableHead>Delta</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow>
-          <TableCell>Packages</TableCell>
+          <TableCell>
+            <span class="table-metric">
+              <PackageOpen aria-hidden="true" :size="16" />
+              Packages
+            </span>
+          </TableCell>
           <TableCell>{{ formatCompact(report.before.packageCount) }}</TableCell>
           <TableCell>{{ formatCompact(report.after.packageCount) }}</TableCell>
           <TableCell>{{
@@ -45,7 +56,12 @@ defineProps<{
           }}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell>Compressed tarball traffic</TableCell>
+          <TableCell>
+            <span class="table-metric">
+              <CloudDownload aria-hidden="true" :size="16" />
+              Traffic
+            </span>
+          </TableCell>
           <TableCell>{{ formatBytes(report.before.tarballBytes) }}</TableCell>
           <TableCell>{{ formatBytes(report.after.tarballBytes) }}</TableCell>
           <TableCell>{{
@@ -53,7 +69,12 @@ defineProps<{
           }}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell>Files</TableCell>
+          <TableCell>
+            <span class="table-metric">
+              <FileStack aria-hidden="true" :size="16" />
+              Files
+            </span>
+          </TableCell>
           <TableCell>{{ formatCompact(report.before.fileCount) }}</TableCell>
           <TableCell>{{ formatCompact(report.after.fileCount) }}</TableCell>
           <TableCell>{{
@@ -61,7 +82,12 @@ defineProps<{
           }}</TableCell>
         </TableRow>
         <TableRow>
-          <TableCell>Unpacked size</TableCell>
+          <TableCell>
+            <span class="table-metric">
+              <Archive aria-hidden="true" :size="16" />
+              Size
+            </span>
+          </TableCell>
           <TableCell>{{ formatBytes(report.before.unpackedBytes) }}</TableCell>
           <TableCell>{{ formatBytes(report.after.unpackedBytes) }}</TableCell>
           <TableCell>{{
@@ -72,7 +98,7 @@ defineProps<{
     </Table>
 
     <details class="node-details">
-      <summary>Dependency nodes included</summary>
+      <summary>Nodes</summary>
       <div class="node-columns">
         <div>
           <strong>Before</strong>

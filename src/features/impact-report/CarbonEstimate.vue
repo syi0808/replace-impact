@@ -1,5 +1,14 @@
 <script setup lang="ts">
+import {
+  BatteryCharging,
+  CircleDollarSign,
+  Info,
+  Leaf,
+  ShowerHead,
+  Utensils,
+} from "lucide-vue-next";
 import { computed } from "vue";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { ImpactReport } from "../../types/report";
 import {
@@ -9,7 +18,7 @@ import {
 } from "../../core/metrics/carbon";
 import {
   formatCarbon,
-  formatCompact,
+  formatCount,
   formatUsd,
 } from "../../core/metrics/formatting";
 
@@ -30,65 +39,101 @@ const equivalentTooltips = {
   socialCostOfCarbon:
     "This is not cash saved. It estimates avoided future climate damage using $190 per tCO2, or $0.19 per kgCO2.",
 } as const;
+
+function formatEquivalent(value: number | null): string {
+  if (value === null || Number.isNaN(value)) {
+    return "unknown";
+  }
+
+  return formatCount(value, {
+    maximumFractionDigits: 2,
+    notation: "compact",
+  });
+}
+
+function formatCarbonShort(value: number | null): string {
+  if (value === null || Number.isNaN(value)) {
+    return "unknown";
+  }
+
+  const abs = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+
+  if (abs >= 1000) {
+    return `${sign}${formatCount(abs / 1000, {
+      maximumFractionDigits: 2,
+      notation: "compact",
+    })} t CO2e`;
+  }
+
+  return formatCarbon(value);
+}
 </script>
 
 <template>
   <section class="section-block" aria-labelledby="carbon-heading">
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Communication aid</p>
-        <h2 id="carbon-heading">Estimated emissions avoided</h2>
+        <p class="eyebrow">Carbon</p>
+        <h2 id="carbon-heading">CO2e estimate</h2>
       </div>
-      <strong
-        >{{ formatCarbon(report.metrics.carbonMonthly.monthly) }} /
-        month</strong
-      >
+      <Badge variant="outline">
+        <Leaf aria-hidden="true" :size="14" />
+        {{ formatCarbonShort(report.metrics.carbonMonthly.monthly) }} / mo
+      </Badge>
     </div>
 
-    <dl class="assumption-list">
-      <div>
-        <dt>Energy intensity</dt>
+    <dl class="assumption-list" aria-label="Carbon assumptions">
+      <div title="Energy intensity">
+        <dt>Energy</dt>
         <dd>{{ carbonAssumptions.energyIntensityKWhPerGB }} kWh/GB</dd>
       </div>
-      <div>
-        <dt>Grid intensity</dt>
+      <div title="Grid intensity">
+        <dt>Grid</dt>
         <dd>{{ carbonAssumptions.gridIntensityKgCO2ePerKWh }} kg CO2e/kWh</dd>
       </div>
     </dl>
 
     <div class="equivalence-grid" aria-label="Monthly lifestyle equivalents">
       <Card :title="equivalentTooltips.meal">
-        <span>Average meals</span>
-        <strong>{{ formatCompact(monthlyEquivalents.meals) }}</strong>
-        <small>1 meal = {{ CARBON_EQUIVALENTS.meal.kgCo2e }} kg CO2e</small>
+        <span class="equivalence-icon" aria-hidden="true">
+          <Utensils :size="18" />
+        </span>
+        <span>Meals</span>
+        <strong>{{ formatEquivalent(monthlyEquivalents.meals) }}</strong>
+        <small>{{ CARBON_EQUIVALENTS.meal.kgCo2e }} kg each</small>
       </Card>
       <Card :title="equivalentTooltips.warmShower10Min">
-        <span>Warm showers</span>
+        <span class="equivalence-icon" aria-hidden="true">
+          <ShowerHead :size="18" />
+        </span>
+        <span>Showers</span>
         <strong>{{
-          formatCompact(monthlyEquivalents.warmShowers10Min)
+          formatEquivalent(monthlyEquivalents.warmShowers10Min)
         }}</strong>
-        <small
-          >10 min = {{ CARBON_EQUIVALENTS.warmShower10Min.kgCo2e }} kg
-          CO2e</small
-        >
+        <small>{{ CARBON_EQUIVALENTS.warmShower10Min.kgCo2e }} kg each</small>
       </Card>
       <Card :title="equivalentTooltips.phoneCharge">
-        <span>Phone charges</span>
-        <strong>{{ formatCompact(monthlyEquivalents.phoneCharges) }}</strong>
-        <small
-          >1 charge = {{ CARBON_EQUIVALENTS.phoneCharge.kgCo2e }} kg CO2</small
-        >
+        <span class="equivalence-icon" aria-hidden="true">
+          <BatteryCharging :size="18" />
+        </span>
+        <span>Charges</span>
+        <strong>{{ formatEquivalent(monthlyEquivalents.phoneCharges) }}</strong>
+        <small>{{ CARBON_EQUIVALENTS.phoneCharge.kgCo2e }} kg each</small>
       </Card>
       <Card :title="equivalentTooltips.socialCostOfCarbon">
-        <span>Avoided climate damage</span>
+        <span class="equivalence-icon" aria-hidden="true">
+          <CircleDollarSign :size="18" />
+        </span>
+        <span>Damage</span>
         <strong>{{ formatUsd(monthlyEquivalents.avoidedDamageUsd) }}</strong>
         <small>$190 / tCO2</small>
       </Card>
     </div>
 
-    <p class="caveat">
-      Estimates are approximate and intended for communication, not formal
-      carbon accounting.
+    <p class="report-note">
+      <Info aria-hidden="true" :size="16" />
+      <span>Communication estimate only.</span>
     </p>
   </section>
 </template>

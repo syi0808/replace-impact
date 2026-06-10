@@ -35,7 +35,7 @@ const classes = computed(() =>
   cn(
     "ui-button",
     `ui-button--${props.variant}`,
-    `ui-button--${props.size}`,
+    props.size === "default" ? undefined : `ui-button--${props.size}`,
     props.class,
   ),
 );

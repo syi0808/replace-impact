@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { AlertTriangle } from "lucide-vue-next";
+import {
+  AlertTriangle,
+  ArrowRight,
+  CalendarDays,
+  Download,
+  Info,
+  PackageCheck,
+} from "lucide-vue-next";
 import { computed, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { Alert } from "@/components/ui/alert";
@@ -27,6 +34,15 @@ const query = computed(() => ({
 const loading = ref(false);
 const error = ref<string | null>(null);
 const report = ref<ImpactReport | null>(null);
+const caveatWarnings = computed(() => {
+  if (!report.value) {
+    return [];
+  }
+
+  return report.value.warnings.filter(
+    (warning) => warning !== report.value?.directDependencyWarning,
+  );
+});
 
 let loadId = 0;
 let controller: AbortController | null = null;
@@ -109,13 +125,20 @@ function validateParams(params: {
 
   return null;
 }
+
+function formatShortCount(value: number | null): string {
+  return formatCount(value, {
+    maximumFractionDigits: 2,
+    notation: "compact",
+  });
+}
 </script>
 
 <template>
   <section class="content-page report-page">
     <div v-if="loading" class="loading-panel">
       <Spinner />
-      <span>Resolving live npm metadata and download reach...</span>
+      <span>Resolving npm data...</span>
     </div>
 
     <Alert v-else-if="error" variant="warning" role="alert">
@@ -125,31 +148,33 @@ function validateParams(params: {
 
     <template v-else-if="report">
       <header class="page-header report-header">
-        <p class="eyebrow">Shareable impact report</p>
+        <p class="eyebrow">Impact report</p>
         <h1>
           <code>{{ report.from }}</code>
-          <span>-></span>
+          <ArrowRight class="report-arrow" aria-hidden="true" :size="34" />
           <code>{{ report.to }}</code>
         </h1>
-        <p>
-          In <strong>{{ report.pkg }}</strong
-          >, based on {{ report.rootPackage.name }}@{{
-            report.rootPackage.latestVersion
-          }}
-          and live npm registry data.
+        <p class="report-context">
+          <strong>{{ report.pkg }}</strong> @
+          {{ report.rootPackage.latestVersion }} | live npm data
         </p>
         <div class="header-facts">
           <Badge v-if="report.directDependency" variant="outline">
-            direct {{ report.directDependency.kind }} -
+            <PackageCheck aria-hidden="true" :size="14" />
+            direct {{ report.directDependency.kind }}
             {{ report.directDependency.range }}
           </Badge>
-          <Badge v-else variant="outline">not a direct dependency</Badge>
+          <Badge v-else variant="outline">
+            <PackageCheck aria-hidden="true" :size="14" />
+            indirect
+          </Badge>
           <Badge variant="outline"
-            >monthly downloads
-            {{ formatCount(report.downloads.monthly) }}</Badge
+            ><Download aria-hidden="true" :size="14" />
+            {{ formatShortCount(report.downloads.monthly) }} / mo</Badge
           >
           <Badge variant="outline"
-            >yearly downloads {{ formatCount(report.downloads.yearly) }}</Badge
+            ><CalendarDays aria-hidden="true" :size="14" />
+            {{ formatShortCount(report.downloads.yearly) }} / yr</Badge
           >
         </div>
       </header>
@@ -167,18 +192,22 @@ function validateParams(params: {
       <section class="section-block" aria-labelledby="caveats-heading">
         <div class="section-heading-row">
           <div>
-            <p class="eyebrow">Partial data and caveats</p>
-            <h2 id="caveats-heading">Methodology notes</h2>
+            <p class="eyebrow">Caveats</p>
+            <h2 id="caveats-heading">Notes</h2>
           </div>
         </div>
         <ul class="warning-list">
-          <li>Potential reach, not additive total.</li>
           <li>
-            Missing registry fields render as unknown rather than fabricated
-            values.
+            <Info aria-hidden="true" :size="16" />
+            <span>Potential reach, not total.</span>
           </li>
-          <li v-for="warning in report.warnings" :key="warning">
-            {{ warning }}
+          <li>
+            <Info aria-hidden="true" :size="16" />
+            <span>Unknown registry fields stay unknown.</span>
+          </li>
+          <li v-for="warning in caveatWarnings" :key="warning">
+            <AlertTriangle aria-hidden="true" :size="16" />
+            <span>{{ warning }}</span>
           </li>
         </ul>
       </section>

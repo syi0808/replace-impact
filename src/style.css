@@ -1,8 +1,8 @@
 :root {
   color-scheme: light;
   font-family: "IBM Plex Sans", "Aptos", "Segoe UI", system-ui, sans-serif;
-  --bg: #eef1ed;
-  --surface: #fbfcf8;
+  --bg: #f3f5f4;
+  --surface: #f8faf7;
   --surface-strong: #ffffff;
   --ink: #18231d;
   --muted: #65716a;
@@ -10,10 +10,16 @@
   --border-strong: #9eaa9f;
   --accent: #0d7b66;
   --accent-strong: #075f4d;
+  --accent-contrast: #ffffff;
+  --hover-surface: #e8f1eb;
+  --hover-surface-strong: #dce8df;
   --blue: #2f6fbb;
   --rust: #c94f3d;
   --amber: #b77a22;
-  --shadow: 0 18px 48px rgba(24, 35, 29, 0.09);
+  --table-bg: #f7f9f6;
+  --table-stripe: #eef3ef;
+  --table-head: #e6ede8;
+  --shadow: 0 14px 34px rgba(24, 35, 29, 0.08);
   --radius: 8px;
 }
 
@@ -24,11 +30,7 @@
 body {
   margin: 0;
   min-width: 320px;
-  background:
-    linear-gradient(rgba(24, 35, 29, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(24, 35, 29, 0.035) 1px, transparent 1px),
-    var(--bg);
-  background-size: 28px 28px;
+  background: var(--bg);
   color: var(--ink);
 }
 
@@ -95,11 +97,12 @@ a {
 
 .ui-button--default {
   background: var(--accent);
-  color: white;
+  color: var(--accent-contrast);
 }
 
 .ui-button--default:hover:not(:disabled) {
   background: var(--accent-strong);
+  color: var(--accent-contrast);
 }
 
 .ui-button--secondary,
@@ -112,7 +115,14 @@ a {
 .ui-button--secondary:hover,
 .ui-button--outline:hover {
   border-color: var(--border-strong);
-  background: var(--surface-strong);
+  background: var(--hover-surface);
+  color: var(--ink);
+}
+
+.ui-button--secondary:active,
+.ui-button--outline:active {
+  background: var(--hover-surface-strong);
+  color: var(--ink);
 }
 
 .ui-button--ghost {
@@ -120,16 +130,23 @@ a {
 }
 
 .ui-button--ghost:hover {
-  background: #e5ebe5;
+  background: var(--hover-surface);
+  color: var(--ink);
+}
+
+.ui-button--ghost:active {
+  background: var(--hover-surface-strong);
+  color: var(--ink);
 }
 
 .ui-button--destructive {
   background: var(--rust);
-  color: white;
+  color: var(--accent-contrast);
 }
 
 .ui-button--destructive:hover {
   background: #a63c2e;
+  color: var(--accent-contrast);
 }
 
 .ui-button--link {
@@ -198,10 +215,9 @@ a {
 }
 
 .ui-label > span:first-child {
-  color: var(--muted);
-  font-size: 0.78rem;
+  color: var(--ink);
+  font-size: 0.84rem;
   font-weight: 800;
-  text-transform: uppercase;
 }
 
 .ui-badge {
@@ -276,26 +292,54 @@ a {
 .ui-table-container {
   width: 100%;
   overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--table-bg);
 }
 
 .ui-table {
   width: 100%;
   min-width: 720px;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .ui-table-head,
 .ui-table-cell {
   border-bottom: 1px solid var(--border);
-  padding: 0.75rem;
+  padding: 0.78rem 0.85rem;
   text-align: left;
   vertical-align: top;
 }
 
 .ui-table-head {
-  color: var(--muted);
-  font-size: 0.78rem;
-  text-transform: uppercase;
+  background: var(--table-head);
+  color: #35413a;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.ui-table-head:not(:first-child),
+.ui-table-cell:not(:first-child) {
+  text-align: right;
+}
+
+.ui-table-body .ui-table-row:nth-child(even) .ui-table-cell {
+  background: var(--table-stripe);
+}
+
+.ui-table-body .ui-table-row:hover .ui-table-cell {
+  background: var(--hover-surface);
+}
+
+.ui-table-body .ui-table-row:last-child .ui-table-cell {
+  border-bottom: 0;
+}
+
+.ui-table-cell:first-child {
+  color: #2d3932;
+  font-weight: 800;
 }
 
 .ui-alert {
@@ -363,16 +407,11 @@ pre {
   text-decoration: none;
 }
 
-.brand-mark {
-  display: inline-grid;
+.brand-logo {
+  display: block;
   width: 2rem;
   height: 2rem;
-  place-items: center;
-  border: 1px solid var(--ink);
-  border-radius: var(--radius);
-  background: var(--ink);
-  color: var(--surface);
-  letter-spacing: 0;
+  flex: 0 0 auto;
 }
 
 .site-nav {
@@ -401,7 +440,7 @@ main {
 .hero-workspace {
   display: grid;
   gap: clamp(1rem, 2vw, 1.5rem);
-  padding: clamp(1.25rem, 4vw, 3rem) 0 1rem;
+  padding: clamp(1rem, 3vw, 2.4rem) 0 1rem;
 }
 
 .hero-copy {
@@ -413,8 +452,8 @@ main {
 .content-page h1 {
   margin: 0;
   max-width: 980px;
-  font-size: clamp(2.2rem, 6vw, 5.4rem);
-  line-height: 0.96;
+  font-size: clamp(2.15rem, 5vw, 4.2rem);
+  line-height: 1.03;
   letter-spacing: 0;
 }
 
@@ -429,11 +468,10 @@ main {
 
 .eyebrow {
   margin: 0 0 0.5rem;
-  color: var(--accent-strong);
-  font-size: 0.76rem;
+  color: var(--blue);
+  font-size: 0.84rem;
   font-weight: 800;
   letter-spacing: 0;
-  text-transform: uppercase;
 }
 
 .search-box {
@@ -454,6 +492,20 @@ main {
   padding: 0.7rem;
   background: var(--surface-strong);
   box-shadow: var(--shadow);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.search-control:focus-within {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 4px rgba(13, 123, 102, 0.16),
+    var(--shadow);
+}
+
+.search-control:focus-within > svg {
+  color: var(--accent-strong);
 }
 
 .search-control .ui-input {
@@ -465,6 +517,10 @@ main {
   background: transparent;
   color: var(--ink);
   font-size: 1.08rem;
+}
+
+.search-control .ui-input:focus-visible {
+  box-shadow: none;
 }
 
 .suggestion-panel {
@@ -502,7 +558,8 @@ main {
 .suggestion-row:hover,
 .suggestion-row.is-active,
 .suggestion-row:focus-visible {
-  background: #e5ebe5;
+  background: var(--hover-surface);
+  color: var(--ink);
 }
 
 .suggestion-row span:first-child {
@@ -551,6 +608,8 @@ main {
 
 .example-link:hover {
   border-color: var(--accent);
+  background: var(--hover-surface);
+  color: var(--ink);
 }
 
 .method-grid {
@@ -593,8 +652,13 @@ main {
   font-size: clamp(2rem, 5vw, 4rem);
 }
 
-.report-header h1 span {
+.report-arrow {
   color: var(--rust);
+  flex: 0 0 auto;
+}
+
+.report-context {
+  margin: 0;
 }
 
 .header-facts {
@@ -634,6 +698,10 @@ main {
   margin: 0;
   font-size: clamp(1.15rem, 2vw, 1.55rem);
   letter-spacing: 0;
+}
+
+.section-heading-row .ui-badge {
+  margin-top: 0.1rem;
 }
 
 .dependency-list,
@@ -700,22 +768,48 @@ main {
 
 .metric-card {
   display: grid;
-  gap: 0.9rem;
-  min-height: 13rem;
+  align-content: start;
+  gap: 0.55rem;
+  min-height: 11.5rem;
   padding: 1rem;
   background: var(--surface-strong);
 }
 
-.metric-card > span {
+.metric-card-top,
+.table-metric,
+.measurement-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
   color: var(--muted);
   font-size: 0.86rem;
   font-weight: 800;
+}
+
+.table-metric--right {
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.metric-icon,
+.equivalence-icon {
+  display: inline-flex;
+  width: 1.9rem;
+  height: 1.9rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--accent-strong);
 }
 
 .metric-card strong {
   overflow-wrap: anywhere;
   font-size: clamp(1.35rem, 2.2vw, 2rem);
   letter-spacing: 0;
+  line-height: 1.08;
 }
 
 .metric-card.positive strong {
@@ -726,12 +820,22 @@ main {
   color: var(--rust);
 }
 
+.metric-scope {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
 .metric-card dl,
 .assumption-list,
 .equivalence-grid {
   display: grid;
   gap: 0.5rem;
   margin: 0;
+}
+
+.metric-periods {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .metric-card dl div,
@@ -749,6 +853,16 @@ dt,
   color: var(--muted);
   font-size: 0.78rem;
   font-weight: 800;
+}
+
+.measurement-label {
+  align-items: center;
+}
+
+.measurement-grid strong {
+  overflow-wrap: anywhere;
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  line-height: 1.12;
 }
 
 dd {
@@ -794,16 +908,45 @@ dd {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.assumption-list div {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem;
+  background: var(--surface);
+}
+
 .warning-list {
   display: grid;
   gap: 0.45rem;
   margin: 0;
-  padding-left: 1.1rem;
+  padding: 0;
   color: var(--muted);
+  list-style: none;
+}
+
+.warning-list li,
+.report-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+
+.warning-list svg,
+.report-note svg {
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  color: var(--blue);
+}
+
+.report-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .markdown-preview {
-  max-height: 25rem;
+  max-height: 22rem;
   overflow: auto;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -816,6 +959,30 @@ dd {
   overflow-wrap: anywhere;
 }
 
+.preview-details {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.preview-details summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  color: var(--ink);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.preview-details .markdown-preview {
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
 .measurement-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -826,15 +993,21 @@ dd {
 
 .measurement-grid .ui-card,
 .equivalence-grid .ui-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
   padding: 0.9rem;
   background: var(--surface-strong);
+}
+
+.equivalence-grid .ui-card {
+  min-height: 9rem;
 }
 
 .equivalence-grid strong {
   overflow-wrap: anywhere;
   font-size: clamp(1.25rem, 2vw, 1.8rem);
+  line-height: 1.1;
 }
 
 .prose {
@@ -892,6 +1065,27 @@ dd {
 
   .manual-report-form {
     grid-template-columns: 1fr;
+  }
+
+  .report-page .ui-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .report-page .ui-table-head,
+  .report-page .ui-table-cell {
+    padding: 0.62rem 0.45rem;
+    font-size: 0.78rem;
+  }
+
+  .report-page .ui-table-head:first-child,
+  .report-page .ui-table-cell:first-child {
+    width: 34%;
+  }
+
+  .report-page .table-metric {
+    gap: 0.25rem;
+    font-size: 0.78rem;
   }
 
   .section-heading-row {
