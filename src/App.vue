@@ -12,11 +12,6 @@ const logoUrl = `${import.meta.env.BASE_URL}favicon.svg`;
         <img class="brand-logo" :src="logoUrl" alt="" width="32" height="32" />
         <span>Replace Impact</span>
       </RouterLink>
-      <nav class="site-nav" aria-label="Primary navigation">
-        <Button :as="RouterLink" variant="ghost" size="sm" to="/"
-          >Packages</Button
-        >
-      </nav>
     </header>
 
     <main>
