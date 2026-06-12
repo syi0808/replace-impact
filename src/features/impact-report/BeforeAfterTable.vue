@@ -78,9 +78,11 @@ const packageDelta = computed(() =>
               report.after.estimates.packageCount,
             )
           }}</TableCell>
-          <TableCell>{{
-            formatEstimatedCompact(packageDelta.value, packageDelta.estimate)
-          }}</TableCell>
+          <TableCell>
+            <strong>{{
+              formatEstimatedCompact(packageDelta.value, packageDelta.estimate)
+            }}</strong>
+          </TableCell>
         </TableRow>
         <TableRow>
           <TableCell>
@@ -101,12 +103,14 @@ const packageDelta = computed(() =>
               report.after.estimates.tarballBytes,
             )
           }}</TableCell>
-          <TableCell>{{
-            formatEstimatedBytes(
-              report.metrics.traffic.perInstall,
-              report.metrics.traffic.estimates.perInstall,
-            )
-          }}</TableCell>
+          <TableCell>
+            <strong>{{
+              formatEstimatedBytes(
+                report.metrics.traffic.perInstall,
+                report.metrics.traffic.estimates.perInstall,
+              )
+            }}</strong>
+          </TableCell>
         </TableRow>
         <TableRow>
           <TableCell>
@@ -127,12 +131,14 @@ const packageDelta = computed(() =>
               report.after.estimates.fileCount,
             )
           }}</TableCell>
-          <TableCell>{{
-            formatEstimatedCompact(
-              report.metrics.files.perInstall,
-              report.metrics.files.estimates.perInstall,
-            )
-          }}</TableCell>
+          <TableCell>
+            <strong>{{
+              formatEstimatedCompact(
+                report.metrics.files.perInstall,
+                report.metrics.files.estimates.perInstall,
+              )
+            }}</strong>
+          </TableCell>
         </TableRow>
         <TableRow>
           <TableCell>
@@ -153,12 +159,14 @@ const packageDelta = computed(() =>
               report.after.estimates.unpackedBytes,
             )
           }}</TableCell>
-          <TableCell>{{
-            formatEstimatedBytes(
-              report.metrics.unpacked.perInstall,
-              report.metrics.unpacked.estimates.perInstall,
-            )
-          }}</TableCell>
+          <TableCell>
+            <strong>{{
+              formatEstimatedBytes(
+                report.metrics.unpacked.perInstall,
+                report.metrics.unpacked.estimates.perInstall,
+              )
+            }}</strong>
+          </TableCell>
         </TableRow>
       </TableBody>
     </Table>
