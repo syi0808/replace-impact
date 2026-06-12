@@ -11,7 +11,7 @@ import { computed } from "vue";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { EstimateKind } from "../../types/estimate";
-import type { ImpactReport } from "../../types/report";
+import type { ImpactReport, ReportPeriod } from "../../types/report";
 import {
   carbonAssumptions,
   calculateCarbonEquivalents,
@@ -27,10 +27,24 @@ import {
 
 const props = defineProps<{
   report: ImpactReport;
+  period: ReportPeriod;
 }>();
 
-const yearlyEquivalents = computed(() =>
-  calculateCarbonEquivalents(props.report.metrics.carbonMonthly.yearly),
+const selectedCarbon = computed(
+  () => props.report.metrics.carbonMonthly[props.period],
+);
+const selectedCarbonEstimate = computed(
+  () => props.report.metrics.carbonMonthly.estimates[props.period],
+);
+const selectedEquivalents = computed(() =>
+  calculateCarbonEquivalents(selectedCarbon.value),
+);
+const periodSuffix = computed(() =>
+  props.period === "yearly" ? "/ yr" : "/ mo",
+);
+const periodEquivalentLabel = computed(
+  () =>
+    `${props.period === "yearly" ? "Yearly" : "Monthly"} lifestyle equivalents`,
 );
 
 const equivalentTooltips = {
@@ -82,13 +96,8 @@ function formatCarbonShort(
       </div>
       <Badge variant="outline">
         <Leaf aria-hidden="true" :size="14" />
-        {{
-          formatCarbonShort(
-            report.metrics.carbonMonthly.yearly,
-            report.metrics.carbonMonthly.estimates.yearly,
-          )
-        }}
-        / yr
+        {{ formatCarbonShort(selectedCarbon, selectedCarbonEstimate) }}
+        {{ periodSuffix }}
       </Badge>
     </div>
 
@@ -103,17 +112,14 @@ function formatCarbonShort(
       </div>
     </dl>
 
-    <div class="equivalence-grid" aria-label="Yearly lifestyle equivalents">
+    <div class="equivalence-grid" :aria-label="periodEquivalentLabel">
       <Card :title="equivalentTooltips.meal">
         <span class="equivalence-icon" aria-hidden="true">
           <Utensils :size="18" />
         </span>
         <span>Meal equivalents</span>
         <strong>{{
-          formatEquivalent(
-            yearlyEquivalents.meals,
-            report.metrics.carbonMonthly.estimates.yearly,
-          )
+          formatEquivalent(selectedEquivalents.meals, selectedCarbonEstimate)
         }}</strong>
         <small>{{ CARBON_EQUIVALENTS.meal.kgCo2e }} kg each</small>
       </Card>
@@ -124,8 +130,8 @@ function formatCarbonShort(
         <span>Shower equivalents</span>
         <strong>{{
           formatEquivalent(
-            yearlyEquivalents.warmShowers10Min,
-            report.metrics.carbonMonthly.estimates.yearly,
+            selectedEquivalents.warmShowers10Min,
+            selectedCarbonEstimate,
           )
         }}</strong>
         <small>{{ CARBON_EQUIVALENTS.warmShower10Min.kgCo2e }} kg each</small>
@@ -137,8 +143,8 @@ function formatCarbonShort(
         <span>Phone charges</span>
         <strong>{{
           formatEquivalent(
-            yearlyEquivalents.phoneCharges,
-            report.metrics.carbonMonthly.estimates.yearly,
+            selectedEquivalents.phoneCharges,
+            selectedCarbonEstimate,
           )
         }}</strong>
         <small>{{ CARBON_EQUIVALENTS.phoneCharge.kgCo2e }} kg each</small>
@@ -150,8 +156,8 @@ function formatCarbonShort(
         <span>Avoided damage</span>
         <strong>{{
           formatEstimatedUsd(
-            yearlyEquivalents.avoidedDamageUsd,
-            report.metrics.carbonMonthly.estimates.yearly,
+            selectedEquivalents.avoidedDamageUsd,
+            selectedCarbonEstimate,
           )
         }}</strong>
         <small>$190 / tCO2</small>

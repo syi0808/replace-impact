@@ -2,17 +2,19 @@
 import {
   AlertTriangle,
   ArrowRight,
+  Calendar,
   CalendarDays,
   Download,
   Info,
   PackageCheck,
 } from "lucide-vue-next";
 import { computed, onUnmounted, ref, watch } from "vue";
+import type { Component } from "vue";
 import { useRoute } from "vue-router";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Spinner } from "@/components/ui/spinner";
-import type { ImpactReport } from "../types/report";
+import type { ImpactReport, ReportPeriod } from "../types/report";
 import { isValidPackageName } from "../core/npm/resolvePackage";
 import { createImpactReport } from "../features/impact-report/createImpactReport";
 import { formatCount } from "../core/metrics/formatting";
@@ -33,6 +35,23 @@ const query = computed(() => ({
 const loading = ref(false);
 const error = ref<string | null>(null);
 const report = ref<ImpactReport | null>(null);
+const statisticPeriod = ref<ReportPeriod>("yearly");
+const periodOptions = [
+  {
+    value: "yearly",
+    label: "Yearly",
+    icon: CalendarDays,
+  },
+  {
+    value: "monthly",
+    label: "Monthly",
+    icon: Calendar,
+  },
+] satisfies ReadonlyArray<{
+  value: ReportPeriod;
+  label: string;
+  icon: Component;
+}>;
 const caveatWarnings = computed(() => {
   if (!report.value) {
     return [];
@@ -183,7 +202,30 @@ function formatKnownIssue(warning: string): string {
 
     <template v-else-if="report">
       <header class="page-header report-header">
-        <p class="eyebrow">Dependency savings</p>
+        <div class="report-header-top">
+          <p class="eyebrow">Replacement savings</p>
+          <div
+            class="period-toggle"
+            role="radiogroup"
+            aria-label="Statistics basis"
+          >
+            <label
+              v-for="option in periodOptions"
+              :key="option.value"
+              class="period-toggle-option"
+              :class="{ 'is-active': statisticPeriod === option.value }"
+            >
+              <input
+                v-model="statisticPeriod"
+                type="radio"
+                name="report-statistic-period"
+                :value="option.value"
+              />
+              <component :is="option.icon" aria-hidden="true" :size="15" />
+              <span>{{ option.label }}</span>
+            </label>
+          </div>
+        </div>
         <h1>
           <code>{{ report.from }}</code>
           <ArrowRight class="report-arrow" aria-hidden="true" :size="34" />
@@ -219,10 +261,10 @@ function formatKnownIssue(warning: string): string {
         <span>{{ report.directDependencyWarning }}</span>
       </Alert>
 
-      <ImpactSummary :report="report" />
+      <ImpactSummary :report="report" :period="statisticPeriod" />
       <BeforeAfterTable :report="report" />
-      <NetworkImpact :report="report" />
-      <CarbonEstimate :report="report" />
+      <NetworkImpact :report="report" :period="statisticPeriod" />
+      <CarbonEstimate :report="report" :period="statisticPeriod" />
 
       <section class="section-block" aria-labelledby="caveats-heading">
         <div class="section-heading-row">

@@ -22,6 +22,8 @@ export type DownloadsSummary = {
   warnings: string[];
 };
 
+export type ReportPeriod = "monthly" | "yearly";
+
 export type SignedMetric = {
   label: string;
   perInstall: number | null;

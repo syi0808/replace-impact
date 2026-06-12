@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { ImpactReport } from "../../types/report";
+import type { ImpactReport, ReportPeriod } from "../../types/report";
 import {
   calculateTransferSeconds,
   networkProfiles,
@@ -17,6 +17,7 @@ import { formatEstimatedDuration } from "../../core/metrics/formatting";
 
 defineProps<{
   report: ImpactReport;
+  period: ReportPeriod;
 }>();
 
 function formatTransferTime(
@@ -28,6 +29,10 @@ function formatTransferTime(
     calculateTransferSeconds(trafficBytes, downlinkMbps),
     estimate,
   );
+}
+
+function avoidedPeriodHeading(period: ReportPeriod): string {
+  return period === "yearly" ? "Avoided / year" : "Avoided / month";
 }
 </script>
 
@@ -51,8 +56,7 @@ function formatTransferTime(
             </span>
           </TableHead>
           <TableHead>Avoided / install</TableHead>
-          <TableHead>Avoided / month</TableHead>
-          <TableHead>Avoided / year</TableHead>
+          <TableHead>{{ avoidedPeriodHeading(period) }}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -68,15 +72,8 @@ function formatTransferTime(
           }}</TableCell>
           <TableCell>{{
             formatTransferTime(
-              report.metrics.traffic.monthly,
-              report.metrics.traffic.estimates.monthly,
-              profile.downlinkMbps,
-            )
-          }}</TableCell>
-          <TableCell>{{
-            formatTransferTime(
-              report.metrics.traffic.yearly,
-              report.metrics.traffic.estimates.yearly,
+              report.metrics.traffic[period],
+              report.metrics.traffic.estimates[period],
               profile.downlinkMbps,
             )
           }}</TableCell>

@@ -12,7 +12,11 @@ import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { EstimateKind } from "../../types/estimate";
-import type { ImpactReport, SignedMetric } from "../../types/report";
+import type {
+  ImpactReport,
+  ReportPeriod,
+  SignedMetric,
+} from "../../types/report";
 import {
   formatCarbon,
   formatCount,
@@ -25,6 +29,7 @@ import {
 
 defineProps<{
   report: ImpactReport;
+  period: ReportPeriod;
 }>();
 
 type MetricKey = keyof ImpactReport["metrics"];
@@ -129,6 +134,18 @@ function polarityClass(value: number | null): string {
 
   return "positive";
 }
+
+function alternatePeriod(period: ReportPeriod): ReportPeriod {
+  return period === "yearly" ? "monthly" : "yearly";
+}
+
+function periodLabel(period: ReportPeriod): string {
+  return period === "yearly" ? "Yearly" : "Monthly";
+}
+
+function periodScope(period: ReportPeriod): string {
+  return period === "yearly" ? "per year" : "per month";
+}
 </script>
 
 <template>
@@ -156,7 +173,7 @@ function polarityClass(value: number | null): string {
         v-for="item in summaryMetrics"
         :key="item.key"
         class="metric-card"
-        :class="polarityClass(report.metrics[item.key].perInstall)"
+        :class="polarityClass(report.metrics[item.key][period])"
         :aria-label="item.title"
         :title="item.title"
       >
@@ -169,33 +186,33 @@ function polarityClass(value: number | null): string {
         <strong>{{
           formatMetric(
             report.metrics[item.key],
-            report.metrics[item.key].perInstall,
-            report.metrics[item.key].estimates.perInstall,
+            report.metrics[item.key][period],
+            report.metrics[item.key].estimates[period],
+            { compact: true },
           )
         }}</strong>
-        <span class="metric-scope">per install</span>
+        <span class="metric-scope">{{ periodScope(period) }}</span>
         <dl class="metric-periods">
           <div>
-            <dt>Monthly</dt>
+            <dt>Per install</dt>
             <dd>
               {{
                 formatMetric(
                   report.metrics[item.key],
-                  report.metrics[item.key].monthly,
-                  report.metrics[item.key].estimates.monthly,
-                  { compact: true },
+                  report.metrics[item.key].perInstall,
+                  report.metrics[item.key].estimates.perInstall,
                 )
               }}
             </dd>
           </div>
           <div>
-            <dt>Yearly</dt>
+            <dt>{{ periodLabel(alternatePeriod(period)) }}</dt>
             <dd>
               {{
                 formatMetric(
                   report.metrics[item.key],
-                  report.metrics[item.key].yearly,
-                  report.metrics[item.key].estimates.yearly,
+                  report.metrics[item.key][alternatePeriod(period)],
+                  report.metrics[item.key].estimates[alternatePeriod(period)],
                   { compact: true },
                 )
               }}

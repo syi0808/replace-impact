@@ -212,13 +212,14 @@ test("report page renders primary savings, limits, and markdown", async ({
   await expect(page.getByText("direct dependency ^10.0.0")).toBeVisible();
   await expect(page.getByText("1M / mo")).toBeVisible();
   await expect(page.getByText("12M / yr")).toBeVisible();
-  await expect(page.getByText("Monthly").first()).toBeVisible();
+  await expect(page.getByRole("radio", { name: "Yearly" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Monthly" })).not.toBeChecked();
+  await expect(page.getByText("per year").first()).toBeVisible();
   await expect(page.getByText("Reduced by")).toBeVisible();
   await expect(page.getByText("Slow 3G")).toBeVisible();
   await expect(page.getByText("0.4 Mbps")).toBeVisible();
   await expect(page.getByText("Avoided / install")).toBeVisible();
   await expect(page.getByRole("cell", { name: "1 sec" })).toBeVisible();
-  await expect(page.getByText("Avoided / month")).toBeVisible();
   await expect(page.getByText("Avoided / year")).toBeVisible();
   await expect(
     page.getByRole("cell", { name: /sec|min|hr|days|years$/ }).first(),
@@ -234,6 +235,15 @@ test("report page renders primary savings, limits, and markdown", async ({
   await expect(page.getByText("Meal equivalents")).toBeVisible();
   await expect(page.getByText("Phone charges")).toBeVisible();
   await expect(page.getByText("Avoided damage")).toBeVisible();
+
+  await page.getByRole("radio", { name: "Monthly" }).check();
+  await expect(page.getByRole("radio", { name: "Monthly" })).toBeChecked();
+  await expect(page.getByText("per month").first()).toBeVisible();
+  await expect(page.getByText("Avoided / month")).toBeVisible();
+  await expect(carbonSection.getByText("4.89 kg CO2e / mo")).toBeVisible();
+  await expect(
+    carbonSection.locator('[aria-label="Monthly lifestyle equivalents"]'),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Copy" }).click();
   await expect(page.getByRole("button", { name: "Copied" })).toBeVisible();
