@@ -135,13 +135,9 @@ function polarityClass(value: number | null): string {
   <section class="section-block" aria-labelledby="impact-summary-heading">
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Savings</p>
+        <p class="eyebrow">Summary</p>
         <h2 id="impact-summary-heading">Savings</h2>
       </div>
-      <Badge variant="outline">
-        <Info aria-hidden="true" :size="14" />
-        npm metadata + downloads
-      </Badge>
     </div>
 
     <Alert
