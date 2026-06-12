@@ -234,7 +234,10 @@ function formatKnownIssue(warning: string): string {
         <ul class="warning-list">
           <li>
             <Info aria-hidden="true" :size="16" />
-            <span>Potential reach, not total.</span>
+            <span
+              >This estimate reflects possible exposure, and real-world impact
+              may differ.</span
+            >
           </li>
           <li v-if="hasBoundedEstimates">
             <Info aria-hidden="true" :size="16" />
