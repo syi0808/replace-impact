@@ -206,6 +206,11 @@ test("report page renders primary estimates, caveats, and markdown", async ({
     page.getByRole("cell", { name: /sec|min|hr|days|years$/ }).first(),
   ).toBeVisible();
   await expect(page.getByText("Communication estimate only.")).toBeVisible();
+  const carbonSection = page.getByRole("region", { name: "CO2e estimate" });
+  await expect(carbonSection.getByText("58.65 kg CO2e / yr")).toBeVisible();
+  await expect(
+    carbonSection.locator('[aria-label="Yearly lifestyle equivalents"]'),
+  ).toBeVisible();
   await expect(page.getByText("Meals")).toBeVisible();
   await expect(page.getByText("Charges")).toBeVisible();
   await expect(page.getByText("Damage")).toBeVisible();

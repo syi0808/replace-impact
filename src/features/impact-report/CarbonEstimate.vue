@@ -29,8 +29,8 @@ const props = defineProps<{
   report: ImpactReport;
 }>();
 
-const monthlyEquivalents = computed(() =>
-  calculateCarbonEquivalents(props.report.metrics.carbonMonthly.monthly),
+const yearlyEquivalents = computed(() =>
+  calculateCarbonEquivalents(props.report.metrics.carbonMonthly.yearly),
 );
 
 const equivalentTooltips = {
@@ -84,11 +84,11 @@ function formatCarbonShort(
         <Leaf aria-hidden="true" :size="14" />
         {{
           formatCarbonShort(
-            report.metrics.carbonMonthly.monthly,
-            report.metrics.carbonMonthly.estimates.monthly,
+            report.metrics.carbonMonthly.yearly,
+            report.metrics.carbonMonthly.estimates.yearly,
           )
         }}
-        / mo
+        / yr
       </Badge>
     </div>
 
@@ -103,7 +103,7 @@ function formatCarbonShort(
       </div>
     </dl>
 
-    <div class="equivalence-grid" aria-label="Monthly lifestyle equivalents">
+    <div class="equivalence-grid" aria-label="Yearly lifestyle equivalents">
       <Card :title="equivalentTooltips.meal">
         <span class="equivalence-icon" aria-hidden="true">
           <Utensils :size="18" />
@@ -111,8 +111,8 @@ function formatCarbonShort(
         <span>Meals</span>
         <strong>{{
           formatEquivalent(
-            monthlyEquivalents.meals,
-            report.metrics.carbonMonthly.estimates.monthly,
+            yearlyEquivalents.meals,
+            report.metrics.carbonMonthly.estimates.yearly,
           )
         }}</strong>
         <small>{{ CARBON_EQUIVALENTS.meal.kgCo2e }} kg each</small>
@@ -124,8 +124,8 @@ function formatCarbonShort(
         <span>Showers</span>
         <strong>{{
           formatEquivalent(
-            monthlyEquivalents.warmShowers10Min,
-            report.metrics.carbonMonthly.estimates.monthly,
+            yearlyEquivalents.warmShowers10Min,
+            report.metrics.carbonMonthly.estimates.yearly,
           )
         }}</strong>
         <small>{{ CARBON_EQUIVALENTS.warmShower10Min.kgCo2e }} kg each</small>
@@ -137,8 +137,8 @@ function formatCarbonShort(
         <span>Charges</span>
         <strong>{{
           formatEquivalent(
-            monthlyEquivalents.phoneCharges,
-            report.metrics.carbonMonthly.estimates.monthly,
+            yearlyEquivalents.phoneCharges,
+            report.metrics.carbonMonthly.estimates.yearly,
           )
         }}</strong>
         <small>{{ CARBON_EQUIVALENTS.phoneCharge.kgCo2e }} kg each</small>
@@ -150,8 +150,8 @@ function formatCarbonShort(
         <span>Damage</span>
         <strong>{{
           formatEstimatedUsd(
-            monthlyEquivalents.avoidedDamageUsd,
-            report.metrics.carbonMonthly.estimates.monthly,
+            yearlyEquivalents.avoidedDamageUsd,
+            report.metrics.carbonMonthly.estimates.yearly,
           )
         }}</strong>
         <small>$190 / tCO2</small>
