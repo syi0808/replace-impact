@@ -55,7 +55,7 @@ const packageDelta = computed(() =>
           <TableHead>Metric</TableHead>
           <TableHead :title="report.from">Before</TableHead>
           <TableHead :title="afterLabel">After</TableHead>
-          <TableHead>Reduced by</TableHead>
+          <TableHead>Reduced</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
