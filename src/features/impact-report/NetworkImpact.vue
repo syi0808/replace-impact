@@ -18,6 +18,17 @@ import { formatEstimatedDuration } from "../../core/metrics/formatting";
 defineProps<{
   report: ImpactReport;
 }>();
+
+function formatTransferTime(
+  trafficBytes: number | null,
+  estimate: ImpactReport["metrics"]["traffic"]["estimates"]["perInstall"],
+  downlinkMbps: number,
+): string {
+  return formatEstimatedDuration(
+    calculateTransferSeconds(trafficBytes, downlinkMbps),
+    estimate,
+  );
+}
 </script>
 
 <template>
@@ -39,6 +50,7 @@ defineProps<{
               Mbps
             </span>
           </TableHead>
+          <TableHead>Avoided / install</TableHead>
           <TableHead>Avoided / month</TableHead>
           <TableHead>Avoided / year</TableHead>
         </TableRow>
@@ -48,21 +60,24 @@ defineProps<{
           <TableCell>{{ profile.label }}</TableCell>
           <TableCell>{{ profile.downlinkMbps }} Mbps</TableCell>
           <TableCell>{{
-            formatEstimatedDuration(
-              calculateTransferSeconds(
-                report.metrics.traffic.monthly,
-                profile.downlinkMbps,
-              ),
-              report.metrics.traffic.estimates.monthly,
+            formatTransferTime(
+              report.metrics.traffic.perInstall,
+              report.metrics.traffic.estimates.perInstall,
+              profile.downlinkMbps,
             )
           }}</TableCell>
           <TableCell>{{
-            formatEstimatedDuration(
-              calculateTransferSeconds(
-                report.metrics.traffic.yearly,
-                profile.downlinkMbps,
-              ),
+            formatTransferTime(
+              report.metrics.traffic.monthly,
+              report.metrics.traffic.estimates.monthly,
+              profile.downlinkMbps,
+            )
+          }}</TableCell>
+          <TableCell>{{
+            formatTransferTime(
+              report.metrics.traffic.yearly,
               report.metrics.traffic.estimates.yearly,
+              profile.downlinkMbps,
             )
           }}</TableCell>
         </TableRow>

@@ -216,6 +216,8 @@ test("report page renders primary savings, limits, and markdown", async ({
   await expect(page.getByText("Reduced by")).toBeVisible();
   await expect(page.getByText("Slow 3G")).toBeVisible();
   await expect(page.getByText("0.4 Mbps")).toBeVisible();
+  await expect(page.getByText("Avoided / install")).toBeVisible();
+  await expect(page.getByRole("cell", { name: "1 sec" })).toBeVisible();
   await expect(page.getByText("Avoided / month")).toBeVisible();
   await expect(page.getByText("Avoided / year")).toBeVisible();
   await expect(
