@@ -173,7 +173,7 @@ function polarityClass(value: number | null): string {
             report.metrics[item.key].estimates.perInstall,
           )
         }}</strong>
-        <span class="metric-scope">per install change</span>
+        <span class="metric-scope">per install</span>
         <dl class="metric-periods">
           <div>
             <dt>Monthly</dt>
