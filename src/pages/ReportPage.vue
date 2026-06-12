@@ -249,7 +249,6 @@ function formatKnownIssue(warning: string): string {
           <li v-for="warning in knownIssueWarnings" :key="warning">
             <Info aria-hidden="true" :size="16" />
             <span>
-              <span class="known-issue-label">known issue</span>
               {{ formatKnownIssue(warning) }}
             </span>
           </li>
