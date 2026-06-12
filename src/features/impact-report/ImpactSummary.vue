@@ -12,12 +12,15 @@ import {
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import type { EstimateKind } from "../../types/estimate";
 import type { ImpactReport, SignedMetric } from "../../types/report";
 import {
-  formatBytes,
   formatCarbon,
   formatCount,
-  formatCompact,
+  formatEstimatedBytes,
+  formatEstimatedCompact,
+  formatEstimatedCount,
+  formatEstimatedValue,
   formatHours,
 } from "../../core/metrics/formatting";
 
@@ -68,45 +71,54 @@ const summaryMetrics = [
 function formatMetric(
   metric: SignedMetric,
   value: number | null,
+  estimate: EstimateKind,
   options: { compact?: boolean } = {},
 ): string {
   switch (metric.unit) {
     case "bytes":
-      return formatBytes(value);
+      return formatEstimatedBytes(value, estimate);
     case "files":
     case "installs":
     case "packages":
-      return options.compact ? formatShortCount(value) : formatCompact(value);
+      return options.compact
+        ? formatShortCount(value, estimate)
+        : formatEstimatedCompact(value, estimate);
     case "kgCO2e":
-      return options.compact ? formatCarbonShort(value) : formatCarbon(value);
+      return options.compact
+        ? formatCarbonShort(value, estimate)
+        : formatEstimatedValue(value, estimate, formatCarbon);
     case "seconds":
-      return formatHours(value);
+      return formatEstimatedValue(value, estimate, formatHours);
   }
 }
 
-function formatShortCount(value: number | null): string {
-  return formatCount(value, {
+function formatShortCount(
+  value: number | null,
+  estimate: EstimateKind,
+): string {
+  return formatEstimatedCount(value, estimate, {
     maximumFractionDigits: 2,
     notation: "compact",
   });
 }
 
-function formatCarbonShort(value: number | null): string {
-  if (value === null || Number.isNaN(value)) {
-    return "unknown";
-  }
+function formatCarbonShort(
+  value: number | null,
+  estimate: EstimateKind,
+): string {
+  return formatEstimatedValue(value, estimate, (knownValue) => {
+    const abs = Math.abs(knownValue);
+    const sign = knownValue < 0 ? "-" : "";
 
-  const abs = Math.abs(value);
-  const sign = value < 0 ? "-" : "";
+    if (abs >= 1000) {
+      return `${sign}${formatCount(abs / 1000, {
+        maximumFractionDigits: 2,
+        notation: "compact",
+      })} t CO2e`;
+    }
 
-  if (abs >= 1000) {
-    return `${sign}${formatCount(abs / 1000, {
-      maximumFractionDigits: 2,
-      notation: "compact",
-    })} t CO2e`;
-  }
-
-  return formatCarbon(value);
+    return formatCarbon(knownValue);
+  });
 }
 
 function polarityClass(value: number | null): string {
@@ -169,6 +181,7 @@ function polarityClass(value: number | null): string {
           formatMetric(
             report.metrics[item.key],
             report.metrics[item.key].perInstall,
+            report.metrics[item.key].estimates.perInstall,
           )
         }}</strong>
         <span class="metric-scope">per install</span>
@@ -180,6 +193,7 @@ function polarityClass(value: number | null): string {
                 formatMetric(
                   report.metrics[item.key],
                   report.metrics[item.key].monthly,
+                  report.metrics[item.key].estimates.monthly,
                   { compact: true },
                 )
               }}
@@ -192,6 +206,7 @@ function polarityClass(value: number | null): string {
                 formatMetric(
                   report.metrics[item.key],
                   report.metrics[item.key].yearly,
+                  report.metrics[item.key].estimates.yearly,
                   { compact: true },
                 )
               }}

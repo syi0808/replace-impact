@@ -10,6 +10,7 @@ import {
 import { computed } from "vue";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import type { EstimateKind } from "../../types/estimate";
 import type { ImpactReport } from "../../types/report";
 import {
   carbonAssumptions,
@@ -19,7 +20,9 @@ import {
 import {
   formatCarbon,
   formatCount,
-  formatUsd,
+  formatEstimatedCount,
+  formatEstimatedUsd,
+  formatEstimatedValue,
 } from "../../core/metrics/formatting";
 
 const props = defineProps<{
@@ -40,33 +43,33 @@ const equivalentTooltips = {
     "This is not cash saved. It estimates avoided future climate damage using $190 per tCO2, or $0.19 per kgCO2.",
 } as const;
 
-function formatEquivalent(value: number | null): string {
-  if (value === null || Number.isNaN(value)) {
-    return "unknown";
-  }
-
-  return formatCount(value, {
+function formatEquivalent(
+  value: number | null,
+  estimate: EstimateKind,
+): string {
+  return formatEstimatedCount(value, estimate, {
     maximumFractionDigits: 2,
     notation: "compact",
   });
 }
 
-function formatCarbonShort(value: number | null): string {
-  if (value === null || Number.isNaN(value)) {
-    return "unknown";
-  }
+function formatCarbonShort(
+  value: number | null,
+  estimate: EstimateKind,
+): string {
+  return formatEstimatedValue(value, estimate, (knownValue) => {
+    const abs = Math.abs(knownValue);
+    const sign = knownValue < 0 ? "-" : "";
 
-  const abs = Math.abs(value);
-  const sign = value < 0 ? "-" : "";
+    if (abs >= 1000) {
+      return `${sign}${formatCount(abs / 1000, {
+        maximumFractionDigits: 2,
+        notation: "compact",
+      })} t CO2e`;
+    }
 
-  if (abs >= 1000) {
-    return `${sign}${formatCount(abs / 1000, {
-      maximumFractionDigits: 2,
-      notation: "compact",
-    })} t CO2e`;
-  }
-
-  return formatCarbon(value);
+    return formatCarbon(knownValue);
+  });
 }
 </script>
 
@@ -79,7 +82,13 @@ function formatCarbonShort(value: number | null): string {
       </div>
       <Badge variant="outline">
         <Leaf aria-hidden="true" :size="14" />
-        {{ formatCarbonShort(report.metrics.carbonMonthly.monthly) }} / mo
+        {{
+          formatCarbonShort(
+            report.metrics.carbonMonthly.monthly,
+            report.metrics.carbonMonthly.estimates.monthly,
+          )
+        }}
+        / mo
       </Badge>
     </div>
 
@@ -100,7 +109,12 @@ function formatCarbonShort(value: number | null): string {
           <Utensils :size="18" />
         </span>
         <span>Meals</span>
-        <strong>{{ formatEquivalent(monthlyEquivalents.meals) }}</strong>
+        <strong>{{
+          formatEquivalent(
+            monthlyEquivalents.meals,
+            report.metrics.carbonMonthly.estimates.monthly,
+          )
+        }}</strong>
         <small>{{ CARBON_EQUIVALENTS.meal.kgCo2e }} kg each</small>
       </Card>
       <Card :title="equivalentTooltips.warmShower10Min">
@@ -109,7 +123,10 @@ function formatCarbonShort(value: number | null): string {
         </span>
         <span>Showers</span>
         <strong>{{
-          formatEquivalent(monthlyEquivalents.warmShowers10Min)
+          formatEquivalent(
+            monthlyEquivalents.warmShowers10Min,
+            report.metrics.carbonMonthly.estimates.monthly,
+          )
         }}</strong>
         <small>{{ CARBON_EQUIVALENTS.warmShower10Min.kgCo2e }} kg each</small>
       </Card>
@@ -118,7 +135,12 @@ function formatCarbonShort(value: number | null): string {
           <BatteryCharging :size="18" />
         </span>
         <span>Charges</span>
-        <strong>{{ formatEquivalent(monthlyEquivalents.phoneCharges) }}</strong>
+        <strong>{{
+          formatEquivalent(
+            monthlyEquivalents.phoneCharges,
+            report.metrics.carbonMonthly.estimates.monthly,
+          )
+        }}</strong>
         <small>{{ CARBON_EQUIVALENTS.phoneCharge.kgCo2e }} kg each</small>
       </Card>
       <Card :title="equivalentTooltips.socialCostOfCarbon">
@@ -126,7 +148,12 @@ function formatCarbonShort(value: number | null): string {
           <CircleDollarSign :size="18" />
         </span>
         <span>Damage</span>
-        <strong>{{ formatUsd(monthlyEquivalents.avoidedDamageUsd) }}</strong>
+        <strong>{{
+          formatEstimatedUsd(
+            monthlyEquivalents.avoidedDamageUsd,
+            report.metrics.carbonMonthly.estimates.monthly,
+          )
+        }}</strong>
         <small>$190 / tCO2</small>
       </Card>
     </div>

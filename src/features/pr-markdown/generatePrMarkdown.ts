@@ -1,13 +1,14 @@
 import type { ImpactReport, SignedMetric } from "../../types/report";
+import type { EstimateKind } from "../../types/estimate";
 import {
   networkProfiles,
   calculateTransferSeconds,
 } from "../../core/metrics/networkTime";
 import {
-  formatBytes,
-  formatCarbon,
-  formatCompact,
-  formatHours,
+  formatEstimatedBytes,
+  formatEstimatedCarbon,
+  formatEstimatedCompact,
+  formatEstimatedHours,
 } from "../../core/metrics/formatting";
 
 export function generatePrMarkdown(
@@ -22,6 +23,7 @@ export function generatePrMarkdown(
     report.metrics.traffic.yearly,
     networkProfiles["slow-3g"].downlinkMbps,
   );
+  const boundNote = lowerBoundNote(report);
 
   return [
     report.to
@@ -39,14 +41,23 @@ export function generatePrMarkdown(
     metricRow(report.metrics.traffic),
     metricRow(report.metrics.files),
     metricRow(report.metrics.reach),
-    `| Equivalent slow-mobile transfer time avoided | ${formatHours(slowMobileMonthly)} | ${formatHours(
+    `| Equivalent slow-mobile transfer time avoided | ${formatEstimatedHours(
+      slowMobileMonthly,
+      report.metrics.traffic.estimates.monthly,
+    )} | ${formatEstimatedHours(
       slowMobileYearly,
+      report.metrics.traffic.estimates.yearly,
     )} |`,
-    `| Estimated emissions avoided | ${formatCarbon(report.metrics.carbonMonthly.monthly)} | ${formatCarbon(
+    `| Estimated emissions avoided | ${formatEstimatedCarbon(
+      report.metrics.carbonMonthly.monthly,
+      report.metrics.carbonMonthly.estimates.monthly,
+    )} | ${formatEstimatedCarbon(
       report.metrics.carbonMonthly.yearly,
+      report.metrics.carbonMonthly.estimates.yearly,
     )} |`,
     "",
     `Report: ${reportUrl}`,
+    ...(boundNote ? ["", boundNote] : []),
     "",
     "These figures are estimates. npm downloads are used as a proxy for install frequency. Real-world impact depends on package manager cache behavior, registry mirrors, lockfile deduplication, CI caching, and downstream dependency graphs.",
     "",
@@ -55,23 +66,40 @@ export function generatePrMarkdown(
 }
 
 function metricRow(metric: SignedMetric): string {
-  return `| ${metric.label} | ${formatMetricValue(metric, metric.monthly)} | ${formatMetricValue(
+  return `| ${metric.label} | ${formatMetricValue(
     metric,
-    metric.yearly,
-  )} |`;
+    metric.monthly,
+    metric.estimates.monthly,
+  )} | ${formatMetricValue(metric, metric.yearly, metric.estimates.yearly)} |`;
 }
 
-function formatMetricValue(metric: SignedMetric, value: number | null): string {
+function formatMetricValue(
+  metric: SignedMetric,
+  value: number | null,
+  estimate: EstimateKind,
+): string {
   switch (metric.unit) {
     case "bytes":
-      return formatBytes(value);
+      return formatEstimatedBytes(value, estimate);
     case "files":
     case "installs":
     case "packages":
-      return formatCompact(value);
+      return formatEstimatedCompact(value, estimate);
     case "seconds":
-      return formatHours(value);
+      return formatEstimatedHours(value, estimate);
     case "kgCO2e":
-      return formatCarbon(value);
+      return formatEstimatedCarbon(value, estimate);
   }
+}
+
+function lowerBoundNote(report: ImpactReport): string {
+  const hasBounds = Object.values(report.metrics).some((metric) =>
+    Object.values(metric.estimates).some(
+      (estimate) => estimate === "lower-bound" || estimate === "upper-bound",
+    ),
+  );
+
+  return hasBounds
+    ? "Values with + are known lower bounds from partial registry metadata."
+    : "";
 }

@@ -1,8 +1,10 @@
 import type { ImpactReport, SignedMetric } from "../../types/report";
-import { calculateCarbonKgCO2e } from "../../core/metrics/carbon";
+import type { EstimatedValue } from "../../types/estimate";
+import { calculateEstimatedCarbonKgCO2e } from "../../core/metrics/carbon";
 import {
-  calculatePerInstallDelta,
-  calculatePeriodValue,
+  calculateEstimatedPerInstallDelta,
+  calculateEstimatedPeriodValue,
+  unknownEstimate,
 } from "../../core/metrics/traffic";
 import { fetchDownloadsSummary } from "../../core/npm/downloadsClient";
 import { fetchPackageMetadata } from "../../core/npm/registryClient";
@@ -69,21 +71,17 @@ export async function createImpactReport(
     downloadsPromise,
   ]);
 
-  const trafficPerInstall = calculatePerInstallDelta(
-    before.tarballBytes,
-    after.tarballBytes,
+  const trafficPerInstall = calculateEstimatedPerInstallDelta(
+    snapshotMetric(before, "tarballBytes"),
+    snapshotMetric(after, "tarballBytes"),
   );
-  const filesPerInstall = calculatePerInstallDelta(
-    before.fileCount,
-    after.fileCount,
+  const filesPerInstall = calculateEstimatedPerInstallDelta(
+    snapshotMetric(before, "fileCount"),
+    snapshotMetric(after, "fileCount"),
   );
-  const unpackedPerInstall = calculatePerInstallDelta(
-    before.unpackedBytes,
-    after.unpackedBytes,
-  );
-  const monthlyTraffic = calculatePeriodValue(
-    trafficPerInstall,
-    downloads.monthly,
+  const unpackedPerInstall = calculateEstimatedPerInstallDelta(
+    snapshotMetric(before, "unpackedBytes"),
+    snapshotMetric(after, "unpackedBytes"),
   );
 
   const warnings = [
@@ -129,17 +127,22 @@ export async function createImpactReport(
           directDependency?.kind === "dependency" ? downloads.monthly : null,
         yearly:
           directDependency?.kind === "dependency" ? downloads.yearly : null,
+        estimates: {
+          perInstall:
+            directDependency?.kind === "dependency" ? "exact" : "unknown",
+          monthly:
+            directDependency?.kind === "dependency" &&
+            downloads.monthly !== null
+              ? "exact"
+              : "unknown",
+          yearly:
+            directDependency?.kind === "dependency" && downloads.yearly !== null
+              ? "exact"
+              : "unknown",
+        },
         unit: "installs",
       },
-      carbonMonthly: {
-        label: "Estimated emissions avoided",
-        perInstall: calculateCarbonKgCO2e(trafficPerInstall),
-        monthly: calculateCarbonKgCO2e(monthlyTraffic),
-        yearly: calculateCarbonKgCO2e(
-          calculatePeriodValue(trafficPerInstall, downloads.yearly),
-        ),
-        unit: "kgCO2e",
-      },
+      carbonMonthly: buildCarbonMetric(trafficPerInstall, downloads),
     },
     warnings,
     generatedAt: new Date().toISOString(),
@@ -152,6 +155,12 @@ function emptyPackageSnapshot(): ImpactReport["after"] {
     fileCount: 0,
     tarballBytes: 0,
     unpackedBytes: 0,
+    estimates: {
+      packageCount: "exact",
+      fileCount: "exact",
+      tarballBytes: "exact",
+      unpackedBytes: "exact",
+    },
     dependencyNodes: [],
     warnings: [],
   };
@@ -159,15 +168,69 @@ function emptyPackageSnapshot(): ImpactReport["after"] {
 
 function buildMetric(
   label: string,
-  perInstall: number | null,
+  perInstall: EstimatedValue,
   downloads: { monthly: number | null; yearly: number | null },
   unit: SignedMetric["unit"],
 ): SignedMetric {
+  const monthly = calculateEstimatedPeriodValue(perInstall, downloads.monthly);
+  const yearly = calculateEstimatedPeriodValue(perInstall, downloads.yearly);
+
   return {
     label,
-    perInstall,
-    monthly: calculatePeriodValue(perInstall, downloads.monthly),
-    yearly: calculatePeriodValue(perInstall, downloads.yearly),
+    perInstall: perInstall.value,
+    monthly: monthly.value,
+    yearly: yearly.value,
+    estimates: {
+      perInstall: perInstall.estimate,
+      monthly: monthly.estimate,
+      yearly: yearly.estimate,
+    },
     unit,
+  };
+}
+
+function buildCarbonMetric(
+  trafficPerInstall: EstimatedValue,
+  downloads: { monthly: number | null; yearly: number | null },
+): SignedMetric {
+  const monthlyTraffic = calculateEstimatedPeriodValue(
+    trafficPerInstall,
+    downloads.monthly,
+  );
+  const yearlyTraffic = calculateEstimatedPeriodValue(
+    trafficPerInstall,
+    downloads.yearly,
+  );
+  const perInstall = calculateEstimatedCarbonKgCO2e(trafficPerInstall);
+  const monthly = calculateEstimatedCarbonKgCO2e(monthlyTraffic);
+  const yearly = calculateEstimatedCarbonKgCO2e(yearlyTraffic);
+
+  return {
+    label: "Estimated emissions avoided",
+    perInstall: perInstall.value,
+    monthly: monthly.value,
+    yearly: yearly.value,
+    estimates: {
+      perInstall: perInstall.estimate,
+      monthly: monthly.estimate,
+      yearly: yearly.estimate,
+    },
+    unit: "kgCO2e",
+  };
+}
+
+function snapshotMetric(
+  snapshot: ImpactReport["before"],
+  key: "fileCount" | "tarballBytes" | "unpackedBytes",
+): EstimatedValue {
+  const value = snapshot[key];
+
+  if (value === null) {
+    return unknownEstimate();
+  }
+
+  return {
+    value,
+    estimate: snapshot.estimates[key],
   };
 }

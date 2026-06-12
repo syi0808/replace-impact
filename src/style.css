@@ -976,6 +976,25 @@ dd {
   color: var(--blue);
 }
 
+.known-issue-label {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(13, 123, 102, 0.28);
+  border-radius: 999px;
+  margin-right: 0.35rem;
+  padding: 0.08rem 0.38rem;
+  background: rgba(13, 123, 102, 0.08);
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.warning-list code {
+  color: var(--ink);
+  font-size: 0.88em;
+}
+
 .report-note {
   margin: 0;
   color: var(--muted);

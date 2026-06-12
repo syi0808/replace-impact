@@ -13,7 +13,7 @@ import {
   calculateTransferSeconds,
   networkProfiles,
 } from "../../core/metrics/networkTime";
-import { formatDuration } from "../../core/metrics/formatting";
+import { formatEstimatedDuration } from "../../core/metrics/formatting";
 
 defineProps<{
   report: ImpactReport;
@@ -48,19 +48,21 @@ defineProps<{
           <TableCell>{{ profile.label }}</TableCell>
           <TableCell>{{ profile.downlinkMbps }} Mbps</TableCell>
           <TableCell>{{
-            formatDuration(
+            formatEstimatedDuration(
               calculateTransferSeconds(
                 report.metrics.traffic.monthly,
                 profile.downlinkMbps,
               ),
+              report.metrics.traffic.estimates.monthly,
             )
           }}</TableCell>
           <TableCell>{{
-            formatDuration(
+            formatEstimatedDuration(
               calculateTransferSeconds(
                 report.metrics.traffic.yearly,
                 profile.downlinkMbps,
               ),
+              report.metrics.traffic.estimates.yearly,
             )
           }}</TableCell>
         </TableRow>

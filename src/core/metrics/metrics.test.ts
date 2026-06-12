@@ -5,10 +5,17 @@ import {
   formatCarbon,
   formatCompact,
   formatDuration,
+  formatEstimatedBytes,
+  formatEstimatedCompact,
   formatHours,
 } from "./formatting";
 import { calculateTransferSeconds } from "./networkTime";
-import { calculatePerInstallDelta, calculatePeriodValue } from "./traffic";
+import {
+  calculateEstimatedPerInstallDelta,
+  calculateEstimatedPeriodValue,
+  calculatePerInstallDelta,
+  calculatePeriodValue,
+} from "./traffic";
 
 describe("metric formulas", () => {
   it("preserves negative savings as increases", () => {
@@ -19,6 +26,28 @@ describe("metric formulas", () => {
   it("returns unknown when either side is missing", () => {
     expect(calculatePerInstallDelta(null, 140)).toBeNull();
     expect(calculatePeriodValue(null, 10)).toBeNull();
+  });
+
+  it("propagates lower-bound deltas when the missing side is safe", () => {
+    const delta = calculateEstimatedPerInstallDelta(
+      { value: 122, estimate: "lower-bound" },
+      { value: 5, estimate: "exact" },
+    );
+
+    expect(delta).toEqual({ value: 117, estimate: "lower-bound" });
+    expect(calculateEstimatedPeriodValue(delta, 10)).toEqual({
+      value: 1170,
+      estimate: "lower-bound",
+    });
+  });
+
+  it("keeps ambiguous bounded deltas unknown", () => {
+    expect(
+      calculateEstimatedPerInstallDelta(
+        { value: 122, estimate: "lower-bound" },
+        { value: 5, estimate: "lower-bound" },
+      ),
+    ).toEqual({ value: null, estimate: "unknown" });
   });
 
   it("uses bytes and downlink Mbps for equivalent transfer time", () => {
@@ -46,5 +75,10 @@ describe("formatting", () => {
 
   it("formats large counts with full digits instead of compact suffixes", () => {
     expect(formatCompact(1_234_567)).toBe("1,234,567");
+  });
+
+  it("formats lower bounds with a plus suffix", () => {
+    expect(formatEstimatedCompact(51, "lower-bound")).toBe("51+");
+    expect(formatEstimatedBytes(1_500, "lower-bound")).toBe("1.5 kB+");
   });
 });

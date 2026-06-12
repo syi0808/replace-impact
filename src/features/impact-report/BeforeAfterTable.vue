@@ -15,13 +15,29 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { ImpactReport } from "../../types/report";
-import { formatBytes, formatCompact } from "../../core/metrics/formatting";
+import {
+  formatEstimatedBytes,
+  formatEstimatedCompact,
+} from "../../core/metrics/formatting";
+import { calculateEstimatedPerInstallDelta } from "../../core/metrics/traffic";
 
 const props = defineProps<{
   report: ImpactReport;
 }>();
 
 const afterLabel = computed(() => props.report.to ?? "native API / removed");
+const packageDelta = computed(() =>
+  calculateEstimatedPerInstallDelta(
+    {
+      value: props.report.before.packageCount,
+      estimate: props.report.before.estimates.packageCount,
+    },
+    {
+      value: props.report.after.packageCount,
+      estimate: props.report.after.estimates.packageCount,
+    },
+  ),
+);
 </script>
 
 <template>
@@ -50,12 +66,20 @@ const afterLabel = computed(() => props.report.to ?? "native API / removed");
               Packages
             </span>
           </TableCell>
-          <TableCell>{{ formatCompact(report.before.packageCount) }}</TableCell>
-          <TableCell>{{ formatCompact(report.after.packageCount) }}</TableCell>
           <TableCell>{{
-            formatCompact(
-              report.before.packageCount - report.after.packageCount,
+            formatEstimatedCompact(
+              report.before.packageCount,
+              report.before.estimates.packageCount,
             )
+          }}</TableCell>
+          <TableCell>{{
+            formatEstimatedCompact(
+              report.after.packageCount,
+              report.after.estimates.packageCount,
+            )
+          }}</TableCell>
+          <TableCell>{{
+            formatEstimatedCompact(packageDelta.value, packageDelta.estimate)
           }}</TableCell>
         </TableRow>
         <TableRow>
@@ -65,10 +89,23 @@ const afterLabel = computed(() => props.report.to ?? "native API / removed");
               Traffic
             </span>
           </TableCell>
-          <TableCell>{{ formatBytes(report.before.tarballBytes) }}</TableCell>
-          <TableCell>{{ formatBytes(report.after.tarballBytes) }}</TableCell>
           <TableCell>{{
-            formatBytes(report.metrics.traffic.perInstall)
+            formatEstimatedBytes(
+              report.before.tarballBytes,
+              report.before.estimates.tarballBytes,
+            )
+          }}</TableCell>
+          <TableCell>{{
+            formatEstimatedBytes(
+              report.after.tarballBytes,
+              report.after.estimates.tarballBytes,
+            )
+          }}</TableCell>
+          <TableCell>{{
+            formatEstimatedBytes(
+              report.metrics.traffic.perInstall,
+              report.metrics.traffic.estimates.perInstall,
+            )
           }}</TableCell>
         </TableRow>
         <TableRow>
@@ -78,10 +115,23 @@ const afterLabel = computed(() => props.report.to ?? "native API / removed");
               Files
             </span>
           </TableCell>
-          <TableCell>{{ formatCompact(report.before.fileCount) }}</TableCell>
-          <TableCell>{{ formatCompact(report.after.fileCount) }}</TableCell>
           <TableCell>{{
-            formatCompact(report.metrics.files.perInstall)
+            formatEstimatedCompact(
+              report.before.fileCount,
+              report.before.estimates.fileCount,
+            )
+          }}</TableCell>
+          <TableCell>{{
+            formatEstimatedCompact(
+              report.after.fileCount,
+              report.after.estimates.fileCount,
+            )
+          }}</TableCell>
+          <TableCell>{{
+            formatEstimatedCompact(
+              report.metrics.files.perInstall,
+              report.metrics.files.estimates.perInstall,
+            )
           }}</TableCell>
         </TableRow>
         <TableRow>
@@ -91,10 +141,23 @@ const afterLabel = computed(() => props.report.to ?? "native API / removed");
               Size
             </span>
           </TableCell>
-          <TableCell>{{ formatBytes(report.before.unpackedBytes) }}</TableCell>
-          <TableCell>{{ formatBytes(report.after.unpackedBytes) }}</TableCell>
           <TableCell>{{
-            formatBytes(report.metrics.unpacked.perInstall)
+            formatEstimatedBytes(
+              report.before.unpackedBytes,
+              report.before.estimates.unpackedBytes,
+            )
+          }}</TableCell>
+          <TableCell>{{
+            formatEstimatedBytes(
+              report.after.unpackedBytes,
+              report.after.estimates.unpackedBytes,
+            )
+          }}</TableCell>
+          <TableCell>{{
+            formatEstimatedBytes(
+              report.metrics.unpacked.perInstall,
+              report.metrics.unpacked.estimates.perInstall,
+            )
           }}</TableCell>
         </TableRow>
       </TableBody>

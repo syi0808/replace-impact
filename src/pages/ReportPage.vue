@@ -42,6 +42,23 @@ const caveatWarnings = computed(() => {
     (warning) => warning !== report.value?.directDependencyWarning,
   );
 });
+const knownIssueWarnings = computed(() =>
+  caveatWarnings.value.filter(isKnownMetadataIssue),
+);
+const otherWarnings = computed(() =>
+  caveatWarnings.value.filter((warning) => !isKnownMetadataIssue(warning)),
+);
+const hasBoundedEstimates = computed(() => {
+  if (!report.value) {
+    return false;
+  }
+
+  return Object.values(report.value.metrics).some((metric) =>
+    Object.values(metric.estimates).some(
+      (estimate) => estimate === "lower-bound" || estimate === "upper-bound",
+    ),
+  );
+});
 
 let loadId = 0;
 let controller: AbortController | null = null;
@@ -138,6 +155,18 @@ function formatShortCount(value: number | null): string {
     notation: "compact",
   });
 }
+
+function isKnownMetadataIssue(warning: string): boolean {
+  return /does not publish (fileCount|unpackedSize) metadata|compressed tarball size is unknown/.test(
+    warning,
+  );
+}
+
+function formatKnownIssue(warning: string): string {
+  return warning
+    .replace(/^Before graph: /, "Before subtree: ")
+    .replace(/^After graph: /, "After subtree: ");
+}
 </script>
 
 <template>
@@ -207,11 +236,21 @@ function formatShortCount(value: number | null): string {
             <Info aria-hidden="true" :size="16" />
             <span>Potential reach, not total.</span>
           </li>
-          <li>
+          <li v-if="hasBoundedEstimates">
             <Info aria-hidden="true" :size="16" />
-            <span>Unknown registry fields stay unknown.</span>
+            <span
+              ><code>+</code> marks a known lower bound from partial registry
+              metadata.</span
+            >
           </li>
-          <li v-for="warning in caveatWarnings" :key="warning">
+          <li v-for="warning in knownIssueWarnings" :key="warning">
+            <Info aria-hidden="true" :size="16" />
+            <span>
+              <span class="known-issue-label">known issue</span>
+              {{ formatKnownIssue(warning) }}
+            </span>
+          </li>
+          <li v-for="warning in otherWarnings" :key="warning">
             <AlertTriangle aria-hidden="true" :size="16" />
             <span>{{ warning }}</span>
           </li>
