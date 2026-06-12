@@ -27,8 +27,8 @@ export function generatePrMarkdown(
 
   return [
     report.to
-      ? "### Dependency replacement impact estimate"
-      : "### Dependency removal impact estimate",
+      ? "### Dependency replacement savings"
+      : "### Dependency removal savings",
     "",
     report.to
       ? `This PR replaces \`${report.from}\` with \`${report.to}\` in \`${report.pkg}\`.`
@@ -36,11 +36,10 @@ export function generatePrMarkdown(
     "",
     "Small per-install savings can compound across the ecosystem.",
     "",
-    "| Metric | Monthly estimate | Yearly estimate |",
+    "| Metric | Monthly savings | Yearly savings |",
     "|---|---:|---:|",
     metricRow(report.metrics.traffic),
     metricRow(report.metrics.files),
-    metricRow(report.metrics.reach),
     `| Equivalent slow-mobile transfer time avoided | ${formatEstimatedHours(
       slowMobileMonthly,
       report.metrics.traffic.estimates.monthly,
@@ -48,7 +47,7 @@ export function generatePrMarkdown(
       slowMobileYearly,
       report.metrics.traffic.estimates.yearly,
     )} |`,
-    `| Estimated emissions avoided | ${formatEstimatedCarbon(
+    `| Emissions avoided | ${formatEstimatedCarbon(
       report.metrics.carbonMonthly.monthly,
       report.metrics.carbonMonthly.estimates.monthly,
     )} | ${formatEstimatedCarbon(
@@ -59,9 +58,9 @@ export function generatePrMarkdown(
     `Report: ${reportUrl}`,
     ...(boundNote ? ["", boundNote] : []),
     "",
-    "These figures are estimates. npm downloads are used as a proxy for install frequency. Real-world impact depends on package manager cache behavior, registry mirrors, lockfile deduplication, CI caching, and downstream dependency graphs.",
+    "These figures represent potential savings. npm downloads are used as a proxy for install frequency. Real-world reductions depend on package manager cache behavior, registry mirrors, lockfile deduplication, CI caching, and downstream dependency graphs.",
     "",
-    "Carbon estimates are communication aids, not formal emissions accounting.",
+    "Carbon figures are communication aids, not formal emissions accounting.",
   ].join("\n");
 }
 
@@ -100,6 +99,6 @@ function lowerBoundNote(report: ImpactReport): string {
   );
 
   return hasBounds
-    ? "Values with + are known lower bounds from partial registry metadata."
+    ? "Values with + are known lower bounds because some registry metadata is missing."
     : "";
 }

@@ -44,8 +44,8 @@ const packageDelta = computed(() =>
   <section class="section-block" aria-labelledby="before-after-heading">
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Subtree</p>
-        <h2 id="before-after-heading">Before / After</h2>
+        <p class="eyebrow">Dependency subtree</p>
+        <h2 id="before-after-heading">Before vs after</h2>
       </div>
     </div>
 
@@ -55,7 +55,7 @@ const packageDelta = computed(() =>
           <TableHead>Metric</TableHead>
           <TableHead :title="report.from">Before</TableHead>
           <TableHead :title="afterLabel">After</TableHead>
-          <TableHead>Delta</TableHead>
+          <TableHead>Reduced by</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -86,7 +86,7 @@ const packageDelta = computed(() =>
           <TableCell>
             <span class="table-metric">
               <CloudDownload aria-hidden="true" :size="16" />
-              Traffic
+              Compressed package traffic
             </span>
           </TableCell>
           <TableCell>{{
@@ -138,7 +138,7 @@ const packageDelta = computed(() =>
           <TableCell>
             <span class="table-metric">
               <Archive aria-hidden="true" :size="16" />
-              Size
+              Unpacked size
             </span>
           </TableCell>
           <TableCell>{{
@@ -164,7 +164,7 @@ const packageDelta = computed(() =>
     </Table>
 
     <details class="node-details">
-      <summary>Nodes</summary>
+      <summary>Dependency nodes</summary>
       <div class="node-columns">
         <div>
           <strong>Before</strong>

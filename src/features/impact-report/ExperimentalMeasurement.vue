@@ -58,7 +58,7 @@ async function runMeasurement(): Promise<void> {
 
     <p class="report-note">
       <Info aria-hidden="true" :size="16" />
-      <span>Browser result, excluded from the estimate.</span>
+      <span>Browser result, excluded from the savings summary.</span>
     </p>
 
     <div v-if="result?.ok" class="measurement-grid">

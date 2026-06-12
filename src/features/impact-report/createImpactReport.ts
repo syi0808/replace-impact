@@ -54,7 +54,7 @@ export async function createImpactReport(
     directDependency === null
       ? cleanedTo
         ? `${cleanedFrom} is not a direct dependency of ${cleanedPkg}@${rootPackage.latestVersion}; this report compares the replacement subtrees only.`
-        : `${cleanedFrom} is not a direct dependency of ${cleanedPkg}@${rootPackage.latestVersion}; this report estimates removing the dependency subtree only.`
+        : `${cleanedFrom} is not a direct dependency of ${cleanedPkg}@${rootPackage.latestVersion}; this report compares removing the dependency subtree only.`
       : directDependency.kind === "optional"
         ? `${cleanedFrom} is optional in ${cleanedPkg}; optional dependencies are shown but excluded from default installed dependency traffic.`
         : directDependency.kind === "peer"
@@ -103,7 +103,7 @@ export async function createImpactReport(
     downloads,
     metrics: {
       traffic: buildMetric(
-        "Potential package traffic avoided",
+        "Package traffic avoided",
         trafficPerInstall,
         downloads,
         "bytes",
@@ -115,13 +115,13 @@ export async function createImpactReport(
         "files",
       ),
       unpacked: buildMetric(
-        "Filesystem work avoided",
+        "Unpacked size avoided",
         unpackedPerInstall,
         downloads,
         "bytes",
       ),
       reach: {
-        label: "Potential direct npm install paths improved",
+        label: "Potential package installs affected",
         perInstall: directDependency?.kind === "dependency" ? 1 : null,
         monthly:
           directDependency?.kind === "dependency" ? downloads.monthly : null,
@@ -206,7 +206,7 @@ function buildCarbonMetric(
   const yearly = calculateEstimatedCarbonKgCO2e(yearlyTraffic);
 
   return {
-    label: "Estimated emissions avoided",
+    label: "Emissions avoided",
     perInstall: perInstall.value,
     monthly: monthly.value,
     yearly: yearly.value,

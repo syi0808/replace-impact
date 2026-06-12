@@ -34,13 +34,13 @@ const yearlyEquivalents = computed(() =>
 );
 
 const equivalentTooltips = {
-  meal: "1 meal uses a 600 kcal average-meal estimate of 1.5 kg CO2e. Actual emissions vary by ingredient, preparation, and region.",
+  meal: "1 meal uses a 600 kcal average-meal assumption of 1.5 kg CO2e. Actual emissions vary by ingredient, preparation, and region.",
   warmShower10Min:
-    "1 warm shower uses a 10-minute estimate of 1.15 kg CO2e. Actual emissions vary by shower length, water temperature, heater type, and local energy mix.",
+    "1 warm shower uses a 10-minute assumption of 1.15 kg CO2e. Actual emissions vary by shower length, water temperature, heater type, and local energy mix.",
   phoneCharge:
-    "1 smartphone charge uses the US EPA estimate of 0.0124 kg CO2. This depends on the local electricity mix.",
+    "1 smartphone charge uses the US EPA value of 0.0124 kg CO2. This depends on the local electricity mix.",
   socialCostOfCarbon:
-    "This is not cash saved. It estimates avoided future climate damage using $190 per tCO2, or $0.19 per kgCO2.",
+    "This is not cash saved. It uses avoided future climate damage based on $190 per tCO2, or $0.19 per kgCO2.",
 } as const;
 
 function formatEquivalent(
@@ -78,7 +78,7 @@ function formatCarbonShort(
     <div class="section-heading-row">
       <div>
         <p class="eyebrow">Carbon</p>
-        <h2 id="carbon-heading">CO2e estimate</h2>
+        <h2 id="carbon-heading">CO2e avoided</h2>
       </div>
       <Badge variant="outline">
         <Leaf aria-hidden="true" :size="14" />
@@ -94,11 +94,11 @@ function formatCarbonShort(
 
     <dl class="assumption-list" aria-label="Carbon assumptions">
       <div title="Energy intensity">
-        <dt>Energy</dt>
+        <dt>Energy intensity</dt>
         <dd>{{ carbonAssumptions.energyIntensityKWhPerGB }} kWh/GB</dd>
       </div>
       <div title="Grid intensity">
-        <dt>Grid</dt>
+        <dt>Grid intensity</dt>
         <dd>{{ carbonAssumptions.gridIntensityKgCO2ePerKWh }} kg CO2e/kWh</dd>
       </div>
     </dl>
@@ -108,7 +108,7 @@ function formatCarbonShort(
         <span class="equivalence-icon" aria-hidden="true">
           <Utensils :size="18" />
         </span>
-        <span>Meals</span>
+        <span>Meal equivalents</span>
         <strong>{{
           formatEquivalent(
             yearlyEquivalents.meals,
@@ -121,7 +121,7 @@ function formatCarbonShort(
         <span class="equivalence-icon" aria-hidden="true">
           <ShowerHead :size="18" />
         </span>
-        <span>Showers</span>
+        <span>Shower equivalents</span>
         <strong>{{
           formatEquivalent(
             yearlyEquivalents.warmShowers10Min,
@@ -134,7 +134,7 @@ function formatCarbonShort(
         <span class="equivalence-icon" aria-hidden="true">
           <BatteryCharging :size="18" />
         </span>
-        <span>Charges</span>
+        <span>Phone charges</span>
         <strong>{{
           formatEquivalent(
             yearlyEquivalents.phoneCharges,
@@ -147,7 +147,7 @@ function formatCarbonShort(
         <span class="equivalence-icon" aria-hidden="true">
           <CircleDollarSign :size="18" />
         </span>
-        <span>Damage</span>
+        <span>Avoided damage</span>
         <strong>{{
           formatEstimatedUsd(
             yearlyEquivalents.avoidedDamageUsd,
@@ -160,7 +160,7 @@ function formatCarbonShort(
 
     <p class="report-note">
       <Info aria-hidden="true" :size="16" />
-      <span>Communication estimate only.</span>
+      <span>Communication aid, not formal emissions accounting.</span>
     </p>
   </section>
 </template>

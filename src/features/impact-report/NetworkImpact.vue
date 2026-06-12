@@ -24,23 +24,23 @@ defineProps<{
   <section class="section-block" aria-labelledby="network-heading">
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Network</p>
-        <h2 id="network-heading">Transfer time</h2>
+        <p class="eyebrow">Transfer</p>
+        <h2 id="network-heading">Transfer time avoided</h2>
       </div>
     </div>
 
     <Table aria-label="Equivalent network transfer time avoided">
       <TableHeader>
         <TableRow>
-          <TableHead>Profile</TableHead>
+          <TableHead>Network profile</TableHead>
           <TableHead>
             <span class="table-metric table-metric--right">
               <Wifi aria-hidden="true" :size="15" />
               Mbps
             </span>
           </TableHead>
-          <TableHead>Mo</TableHead>
-          <TableHead>Yr</TableHead>
+          <TableHead>Avoided / month</TableHead>
+          <TableHead>Avoided / year</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -71,7 +71,7 @@ defineProps<{
 
     <p class="report-note">
       <Info aria-hidden="true" :size="16" />
-      <span>Transfer comparison, not install duration.</span>
+      <span>Equivalent transfer time only; not install duration.</span>
     </p>
   </section>
 </template>

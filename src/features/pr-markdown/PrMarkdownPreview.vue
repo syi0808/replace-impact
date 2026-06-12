@@ -39,8 +39,8 @@ async function copyMarkdown(): Promise<void> {
   <section class="section-block" aria-labelledby="markdown-heading">
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Pull request note</p>
-        <h2 id="markdown-heading">PR note</h2>
+        <p class="eyebrow">Pull request summary</p>
+        <h2 id="markdown-heading">Copyable PR summary</h2>
       </div>
       <Button variant="outline" type="button" @click="copyMarkdown">
         <Check v-if="copied" aria-hidden="true" :size="17" />

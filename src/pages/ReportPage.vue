@@ -173,7 +173,7 @@ function formatKnownIssue(warning: string): string {
   <section class="content-page report-page">
     <div v-if="loading" class="loading-panel">
       <Spinner />
-      <span>Resolving npm data...</span>
+      <span>Calculating savings from npm data...</span>
     </div>
 
     <Alert v-else-if="error" variant="warning" role="alert">
@@ -183,7 +183,7 @@ function formatKnownIssue(warning: string): string {
 
     <template v-else-if="report">
       <header class="page-header report-header">
-        <p class="eyebrow">Impact report</p>
+        <p class="eyebrow">Dependency savings</p>
         <h1>
           <code>{{ report.from }}</code>
           <ArrowRight class="report-arrow" aria-hidden="true" :size="34" />
@@ -191,7 +191,7 @@ function formatKnownIssue(warning: string): string {
         </h1>
         <p class="report-context">
           <strong>{{ report.pkg }}</strong> @
-          {{ report.rootPackage.latestVersion }} | live npm data
+          {{ report.rootPackage.latestVersion }} | npm metadata + downloads
         </p>
         <div class="header-facts">
           <Badge v-if="report.directDependency" variant="outline">
@@ -227,23 +227,23 @@ function formatKnownIssue(warning: string): string {
       <section class="section-block" aria-labelledby="caveats-heading">
         <div class="section-heading-row">
           <div>
-            <p class="eyebrow">Caveats</p>
-            <h2 id="caveats-heading">Notes</h2>
+            <p class="eyebrow">Savings basis</p>
+            <h2 id="caveats-heading">Limits & assumptions</h2>
           </div>
         </div>
         <ul class="warning-list">
           <li>
             <Info aria-hidden="true" :size="16" />
             <span
-              >This estimate reflects possible exposure, and real-world impact
-              may differ.</span
+              >Values represent potential savings, not guaranteed real-world
+              reductions.</span
             >
           </li>
           <li v-if="hasBoundedEstimates">
             <Info aria-hidden="true" :size="16" />
             <span
-              ><code>+</code> marks a known lower bound from partial registry
-              metadata.</span
+              ><code>+</code> marks a known lower bound because some registry
+              metadata is missing.</span
             >
           </li>
           <li v-for="warning in knownIssueWarnings" :key="warning">

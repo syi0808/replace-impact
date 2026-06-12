@@ -6,7 +6,6 @@ import {
   FileStack,
   HardDriveDownload,
   Leaf,
-  Route,
   Info,
 } from "lucide-vue-next";
 import { Alert } from "@/components/ui/alert";
@@ -33,32 +32,26 @@ type MetricKey = keyof ImpactReport["metrics"];
 const summaryMetrics = [
   {
     key: "traffic",
-    label: "Traffic",
-    title: "Potential package traffic avoided",
+    label: "Package traffic avoided",
+    title: "Package traffic avoided",
     icon: CloudDownload,
   },
   {
     key: "files",
-    label: "Files",
+    label: "Files not unpacked",
     title: "Files not unpacked",
     icon: FileStack,
   },
   {
     key: "unpacked",
-    label: "Size",
-    title: "Filesystem work avoided",
+    label: "Unpacked size avoided",
+    title: "Unpacked size avoided",
     icon: HardDriveDownload,
   },
   {
-    key: "reach",
-    label: "Reach",
-    title: "Potential direct npm install paths improved",
-    icon: Route,
-  },
-  {
     key: "carbonMonthly",
-    label: "CO2e",
-    title: "Estimated emissions avoided",
+    label: "Emissions avoided",
+    title: "Emissions avoided",
     icon: Leaf,
   },
 ] satisfies ReadonlyArray<{
@@ -142,12 +135,12 @@ function polarityClass(value: number | null): string {
   <section class="section-block" aria-labelledby="impact-summary-heading">
     <div class="section-heading-row">
       <div>
-        <p class="eyebrow">Estimate</p>
-        <h2 id="impact-summary-heading">Summary</h2>
+        <p class="eyebrow">Savings</p>
+        <h2 id="impact-summary-heading">Savings</h2>
       </div>
       <Badge variant="outline">
         <Info aria-hidden="true" :size="14" />
-        npm + downloads
+        npm metadata + downloads
       </Badge>
     </div>
 
@@ -159,7 +152,7 @@ function polarityClass(value: number | null): string {
       variant="warning"
     >
       <AlertTriangle aria-hidden="true" :size="16" />
-      <span>May increase traffic.</span>
+      <span>Package traffic may increase.</span>
     </Alert>
 
     <div class="metric-grid">
@@ -184,10 +177,10 @@ function polarityClass(value: number | null): string {
             report.metrics[item.key].estimates.perInstall,
           )
         }}</strong>
-        <span class="metric-scope">per install</span>
+        <span class="metric-scope">per install change</span>
         <dl class="metric-periods">
           <div>
-            <dt>mo</dt>
+            <dt>Monthly</dt>
             <dd>
               {{
                 formatMetric(
@@ -200,7 +193,7 @@ function polarityClass(value: number | null): string {
             </dd>
           </div>
           <div>
-            <dt>yr</dt>
+            <dt>Yearly</dt>
             <dd>
               {{
                 formatMetric(
@@ -218,7 +211,7 @@ function polarityClass(value: number | null): string {
 
     <p class="report-note">
       <Info aria-hidden="true" :size="16" />
-      <span>Estimated from npm metadata and downloads.</span>
+      <span>Based on npm package metadata and download volume.</span>
     </p>
   </section>
 </template>

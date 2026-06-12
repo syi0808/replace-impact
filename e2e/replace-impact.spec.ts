@@ -186,7 +186,7 @@ test("package page can create a dependency removal report", async ({
   await expect(page.getByRole("cell", { name: "0" }).first()).toBeVisible();
 });
 
-test("report page renders primary estimates, caveats, and markdown", async ({
+test("report page renders primary savings, limits, and markdown", async ({
   page,
   context,
 }) => {
@@ -195,25 +195,43 @@ test("report page renders primary estimates, caveats, and markdown", async ({
   });
   await page.goto("/report?pkg=vite&from=glob&to=tinyglobby");
 
-  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Savings$/i })).toBeVisible();
+  await expect(
+    page.getByText("Package traffic avoided", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Files not unpacked", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Unpacked size avoided", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Emissions avoided", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Reach", { exact: true })).toHaveCount(0);
   await expect(page.getByText("direct dependency ^10.0.0")).toBeVisible();
   await expect(page.getByText("1M / mo")).toBeVisible();
   await expect(page.getByText("12M / yr")).toBeVisible();
-  await expect(page.getByText("mo").first()).toBeVisible();
+  await expect(page.getByText("Monthly").first()).toBeVisible();
+  await expect(page.getByText("Reduced by")).toBeVisible();
   await expect(page.getByText("Slow 3G")).toBeVisible();
   await expect(page.getByText("0.4 Mbps")).toBeVisible();
+  await expect(page.getByText("Avoided / month")).toBeVisible();
+  await expect(page.getByText("Avoided / year")).toBeVisible();
   await expect(
     page.getByRole("cell", { name: /sec|min|hr|days|years$/ }).first(),
   ).toBeVisible();
-  await expect(page.getByText("Communication estimate only.")).toBeVisible();
-  const carbonSection = page.getByRole("region", { name: "CO2e estimate" });
+  await expect(
+    page.getByText("Communication aid, not formal emissions accounting."),
+  ).toBeVisible();
+  const carbonSection = page.getByRole("region", { name: "CO2e avoided" });
   await expect(carbonSection.getByText("58.65 kg CO2e / yr")).toBeVisible();
   await expect(
     carbonSection.locator('[aria-label="Yearly lifestyle equivalents"]'),
   ).toBeVisible();
-  await expect(page.getByText("Meals")).toBeVisible();
-  await expect(page.getByText("Charges")).toBeVisible();
-  await expect(page.getByText("Damage")).toBeVisible();
+  await expect(page.getByText("Meal equivalents")).toBeVisible();
+  await expect(page.getByText("Phone charges")).toBeVisible();
+  await expect(page.getByText("Avoided damage")).toBeVisible();
 
   await page.getByRole("button", { name: "Copy" }).click();
   await expect(page.getByRole("button", { name: "Copied" })).toBeVisible();
@@ -226,13 +244,13 @@ test("limited reports and invalid query params show friendly warnings", async ({
   await expect(
     page.getByText("not a direct dependency of vite@6.0.0"),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Savings$/i })).toBeVisible();
 
   await page.goto("/report?pkg=vite&from=glob");
   await expect(
     page.getByRole("heading", { name: /glob.*native API/i }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Savings$/i })).toBeVisible();
 
   await page.goto("/report?pkg=bad%20name&from=glob&to=tinyglobby");
   await expect(
@@ -244,12 +262,12 @@ test("partial API failure and negative savings stay visible", async ({
   page,
 }) => {
   await page.goto("/report?pkg=downloads-fail&from=glob&to=tinyglobby");
-  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Savings$/i })).toBeVisible();
   await expect(page.getByText(/Monthly downloads unavailable/)).toBeVisible();
   await expect(page.getByText("unknown").first()).toBeVisible();
 
   await page.goto("/report?pkg=vite&from=tinyglobby&to=glob");
-  await expect(page.getByText("May increase traffic.")).toBeVisible();
+  await expect(page.getByText("Package traffic may increase.")).toBeVisible();
 });
 
 test("graph limit warnings are visible when triggered", async ({ page }) => {
@@ -300,7 +318,7 @@ test("explicit report URLs work when e18e replacement data fails", async ({
   ).toBeVisible();
 
   await page.goto("/report?pkg=vite&from=glob&to=tinyglobby");
-  await expect(page.getByRole("heading", { name: /Summary/i })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Savings$/i })).toBeVisible();
 });
 
 async function mockExternalApis(page: Page): Promise<void> {
