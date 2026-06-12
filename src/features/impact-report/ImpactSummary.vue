@@ -2,6 +2,8 @@
 import type { Component } from "vue";
 import {
   AlertTriangle,
+  ArrowDown,
+  ArrowUp,
   CloudDownload,
   FileStack,
   HardDriveDownload,
@@ -135,12 +137,20 @@ function polarityClass(value: number | null): string {
   return "positive";
 }
 
-function alternatePeriod(period: ReportPeriod): ReportPeriod {
-  return period === "yearly" ? "monthly" : "yearly";
+function trendIcon(value: number | null): Component | null {
+  if (value === null || value === 0) {
+    return null;
+  }
+
+  return value > 0 ? ArrowUp : ArrowDown;
 }
 
-function periodLabel(period: ReportPeriod): string {
-  return period === "yearly" ? "Yearly" : "Monthly";
+function trendArrowClass(value: number | null): string {
+  if (value === null || value === 0) {
+    return "";
+  }
+
+  return value > 0 ? "trend-arrow--up" : "trend-arrow--down";
 }
 
 function periodScope(period: ReportPeriod): string {
@@ -173,7 +183,6 @@ function periodScope(period: ReportPeriod): string {
         v-for="item in summaryMetrics"
         :key="item.key"
         class="metric-card"
-        :class="polarityClass(report.metrics[item.key][period])"
         :aria-label="item.title"
         :title="item.title"
       >
@@ -183,39 +192,58 @@ function periodScope(period: ReportPeriod): string {
           </span>
           <span>{{ item.label }}</span>
         </div>
-        <strong>{{
-          formatMetric(
-            report.metrics[item.key],
-            report.metrics[item.key][period],
-            report.metrics[item.key].estimates[period],
-            { compact: true },
-          )
-        }}</strong>
-        <span class="metric-scope">{{ periodScope(period) }}</span>
-        <dl class="metric-periods">
-          <div>
-            <dt>Per install</dt>
+        <dl class="metric-values">
+          <div
+            class="metric-value metric-value--primary"
+            :class="polarityClass(report.metrics[item.key][period])"
+          >
+            <dt>{{ periodScope(period) }}</dt>
             <dd>
-              {{
+              <strong>{{
                 formatMetric(
                   report.metrics[item.key],
-                  report.metrics[item.key].perInstall,
-                  report.metrics[item.key].estimates.perInstall,
-                )
-              }}
-            </dd>
-          </div>
-          <div>
-            <dt>{{ periodLabel(alternatePeriod(period)) }}</dt>
-            <dd>
-              {{
-                formatMetric(
-                  report.metrics[item.key],
-                  report.metrics[item.key][alternatePeriod(period)],
-                  report.metrics[item.key].estimates[alternatePeriod(period)],
+                  report.metrics[item.key][period],
+                  report.metrics[item.key].estimates[period],
                   { compact: true },
                 )
-              }}
+              }}</strong>
+              <component
+                :is="trendIcon(report.metrics[item.key][period])"
+                v-if="trendIcon(report.metrics[item.key][period])"
+                :class="[
+                  'trend-arrow',
+                  trendArrowClass(report.metrics[item.key][period]),
+                ]"
+                aria-hidden="true"
+                :size="18"
+              />
+            </dd>
+          </div>
+          <div
+            class="metric-value"
+            :class="polarityClass(report.metrics[item.key].perInstall)"
+          >
+            <dt>per install</dt>
+            <dd>
+              <span>
+                {{
+                  formatMetric(
+                    report.metrics[item.key],
+                    report.metrics[item.key].perInstall,
+                    report.metrics[item.key].estimates.perInstall,
+                  )
+                }}
+              </span>
+              <component
+                :is="trendIcon(report.metrics[item.key].perInstall)"
+                v-if="trendIcon(report.metrics[item.key].perInstall)"
+                :class="[
+                  'trend-arrow',
+                  trendArrowClass(report.metrics[item.key].perInstall),
+                ]"
+                aria-hidden="true"
+                :size="15"
+              />
             </dd>
           </div>
         </dl>

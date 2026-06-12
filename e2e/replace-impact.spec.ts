@@ -196,6 +196,7 @@ test("report page renders primary savings, limits, and markdown", async ({
   await page.goto("/report?pkg=vite&from=glob&to=tinyglobby");
 
   await expect(page.getByRole("heading", { name: /^Savings$/i })).toBeVisible();
+  const savingsSection = page.getByRole("region", { name: /^Savings$/i });
   await expect(
     page.getByText("Package traffic avoided", { exact: true }),
   ).toBeVisible();
@@ -215,7 +216,31 @@ test("report page renders primary savings, limits, and markdown", async ({
   await expect(page.getByRole("radio", { name: "Yearly" })).toBeChecked();
   await expect(page.getByRole("radio", { name: "Monthly" })).not.toBeChecked();
   await expect(page.getByText("per year").first()).toBeVisible();
-  await expect(page.getByText("Reduced by")).toBeVisible();
+  await expect(
+    savingsSection.getByText("per year", { exact: true }),
+  ).toHaveCount(4);
+  await expect(
+    savingsSection.getByText("per install", { exact: true }),
+  ).toHaveCount(4);
+  await expect(
+    savingsSection.getByText("per month", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    savingsSection.locator(".metric-value.positive .trend-arrow--up"),
+  ).toHaveCount(8);
+  await expect(
+    savingsSection.locator(
+      ".metric-value--primary.positive dd > strong + .trend-arrow--up",
+    ),
+  ).toHaveCount(4);
+  await expect(
+    savingsSection.locator(
+      ".metric-value:not(.metric-value--primary).positive dd > span + .trend-arrow--up",
+    ),
+  ).toHaveCount(4);
+  await expect(
+    page.getByRole("columnheader", { name: "Reduced" }),
+  ).toBeVisible();
   await expect(page.getByText("Slow 3G")).toBeVisible();
   await expect(page.getByText("0.4 Mbps")).toBeVisible();
   await expect(page.getByText("Avoided / install")).toBeVisible();
@@ -239,6 +264,12 @@ test("report page renders primary savings, limits, and markdown", async ({
   await page.getByRole("radio", { name: "Monthly" }).check();
   await expect(page.getByRole("radio", { name: "Monthly" })).toBeChecked();
   await expect(page.getByText("per month").first()).toBeVisible();
+  await expect(
+    savingsSection.getByText("per month", { exact: true }),
+  ).toHaveCount(4);
+  await expect(
+    savingsSection.getByText("per year", { exact: true }),
+  ).toHaveCount(0);
   await expect(page.getByText("Avoided / month")).toBeVisible();
   await expect(carbonSection.getByText("4.89 kg CO2e / mo")).toBeVisible();
   await expect(
@@ -280,6 +311,25 @@ test("partial API failure and negative savings stay visible", async ({
 
   await page.goto("/report?pkg=vite&from=tinyglobby&to=glob");
   await expect(page.getByText("Package traffic may increase.")).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: /^Savings$/i })
+      .locator(".metric-value.negative .trend-arrow--down"),
+  ).toHaveCount(8);
+  await expect(
+    page
+      .getByRole("region", { name: /^Savings$/i })
+      .locator(
+        ".metric-value--primary.negative dd > strong + .trend-arrow--down",
+      ),
+  ).toHaveCount(4);
+  await expect(
+    page
+      .getByRole("region", { name: /^Savings$/i })
+      .locator(
+        ".metric-value:not(.metric-value--primary).negative dd > span + .trend-arrow--down",
+      ),
+  ).toHaveCount(4);
 });
 
 test("graph limit warnings are visible when triggered", async ({ page }) => {
