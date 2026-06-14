@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from "vue-router";
-import { Button } from "@/components/ui/button";
+import SiteFooter from "@/components/SiteFooter.vue";
 
 const logoUrl = `${import.meta.env.BASE_URL}favicon.svg`;
 </script>
@@ -17,5 +17,7 @@ const logoUrl = `${import.meta.env.BASE_URL}favicon.svg`;
     <main>
       <RouterView />
     </main>
+
+    <SiteFooter />
   </div>
 </template>
